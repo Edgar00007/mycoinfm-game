@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>MyCoinFM - Պատրաստի Խաղ</title>
+    <style>
+        /* Հիմնական կարգավորումներ */
+        body { margin: 0; background: #0b0e11; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; touch-action: manipulation; }
+        #main-wrapper { max-width: 500px; margin: auto; height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Վերևի հատված */
+        .header { background: #1c2128; padding: 15px; border-bottom: 2px solid #f1c40f; display: flex; justify-content: space-between; align-items: center; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .balance-display { color: #f1c40f; font-weight: bold; font-size: 18px; }
+
+        /* Բոլոր բաժինների ընդհանուր ոճը */
+        .page-section { 
+            display: none; 
+            padding: 20px; 
+            flex-grow: 1; 
+            background: #0b0e11; 
+            overflow-y: auto; 
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* Խաղի էկրան */
+        #game-section { display: block; position: relative; background: #87CEEB; padding: 0; overflow: hidden; }
+        canvas { width: 100%; height: 100%; display: block; }
+
+        /* Քարտերի ոճը (Կաբինետ և Խանութ) */
+        .card, .item-card { 
+            background: #1c2128; 
+            border-radius: 15px; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            border: 1px solid #30363d; 
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .item-card { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            text-align: left; 
+            border-left: 4px solid #f1c40f; 
+        }
+
+        /* Կոճակներ */
+        .action-btn { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 10px; 
+            border: none; 
+            font-weight: bold; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+        .btn-yellow { background: #f1c40f; color: black; }
+        .btn-blue { background: #3498db; color: white; }
+        .btn-red { background: #e74c3c; color: white; }
+        .action-btn:disabled { background: #333 !important; color: #777 !important; }
+
+        /* Անիվի հատված */
+        #wheel-container { position: relative; width: 260px; height: 260px; margin: 20px auto; }
+        #wheelCanvas { border-radius: 50%; border: 5px solid #f1c40f; box-shadow: 0 0 15px rgba(241,196,15,0.4); }
+        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #e74c3c; z-index: 5; }
+
+        /* Բոնուսի ցանց */
+        .daily-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .daily-day { background: #1c2128; border: 1px solid #30363d; border-radius: 10px; padding: 12px; font-size: 12px; position: relative; }
+        .daily-day.active { border-color: #f1c40f; background: rgba(241, 196, 15, 0.15); }
+        .daily-day.claimed::after { content: "✓"; position: absolute; top: 5px; right: 8px; color: #2ecc71; font-weight: bold; }
+
+        /* Նավիգացիա */
+        .nav-bar { display: flex; background: #161b22; border-top: 1px solid #30363d; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { flex: 1; padding: 15px 5px; text-align: center; cursor: pointer; color: #8b949e; font-weight: bold; font-size: 11px; transition: 0.3s; }
+        .nav-item.active { color: #f1c40f; background: rgba(241, 196, 15, 0.1); border-top: 2px solid #f1c40f; }
+    </style>
+</head>
+<body>
+
+    <div id="main-wrapper">
+        <div class="header">
+            <span id="level-indicator" style="font-weight: bold; color: #8b949e;">Մակարդակ: 1</span>
+            <div class="balance-display"><span id="top-balance">0</span> HT</div>
+        </div>
+
+        <div id="game-section" class="page-section" style="display: block;">
+            <canvas id="gameCanvas"></canvas>
+            <button id="startBtn" class="action-btn btn-yellow" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width: auto; padding: 15px 40px; border-radius: 30px;" onclick="initAndStart()">ՍԿՍԵԼ</button>
+        </div>
+
+        <div id="daily-section" class="page-section">
+            <h2 style="text-align: center; color: #f1c40f;">Ամենօրյա Բոնուս</h2>
+            <p style="text-align: center; color: #8b949e;">Մտիր խաղ ամեն օր և հավաքիր HT</p>
+            <div class="daily-grid" id="dailyGrid"></div>
+            <p id="dailyTimerText" style="text-align: center; color: #f1c40f; margin-top: 20px; font-weight: bold;"></p>
+            <button id="claimDailyBtn" class="action-btn btn-yellow" onclick="claimDaily()">ՎԵՐՑՆԵԼ</button>
+        </div>
+
+        <div id="wheel-section" class="page-section">
+            <h2 style="text-align: center; color: #f1c40f;">Բախտի Անիվ</h2>
+            <div id="wheel-container">
+                <div class="wheel-pointer"></div>
+                <canvas id="wheelCanvas" width="250" height="250"></canvas>
+            </div>
+            <p id="wheel-timer" style="text-align: center; color: #8b949e;"></p>
+            <button id="spinBtn" class="action-btn btn-yellow" onclick="spinWheel()">ՊՏՏԵԼ (4ժ ՄԵԿ)</button>
+        </div>
+
+        <div id="shop-section" class="page-section">
+            <h2 style="text-align: center; color: #f1c40f;">Խանութ</h2>
+            <div class="item-card">
+                <div><b>1000 HayToken</b><br><small style="color: #8b949e;">Արժեքը՝ 1000 ֏</small></div>
+                <button class="action-btn btn-yellow" style="width: auto; margin: 0; padding: 10px 20px;" onclick="buyAction('1000 HT')">ԳՆԵԼ</button>
+            </div>
+            <div class="item-card">
+                <div><b>VIP (X2 Միավոր)</b><br><small style="color: #8b949e;">Արժեքը՝ 2500 ֏</small></div>
+                <button class="action-btn btn-yellow" style="width: auto; margin: 0; padding: 10px 20px;" onclick="buyAction('VIP')">ԳՆԵԼ</button>
+            </div>
+        </div>
+
+        <div id="cabinet-section" class="page-section">
+            <h2 style="text-align: center; color: #f1c40f;">Անձնական Էջ</h2>
+            <div class="card">
+                <div style="color:#8b949e; margin-bottom: 10px;">ՁԵՐ ՀԱՇՎԵԿՇԻՌԸ</div>
+                <div id="ht-balance" style="font-size: 32px; color: #2ecc71; font-weight: bold; margin-bottom: 5px;">0.00 HT</div>
+                <div style="color: #f1c40f; font-size: 18px;"><span id="amd-balance">0</span> ֏ (AMD)</div>
+            </div>
+            <div class="card" style="border-color: #3498db;">
+                <h3 style="color: #3498db; margin: 0 0 10px 0;">Հրավիրիր ընկերոջ</h3>
+                <p style="font-size: 13px; color: #8b949e;">Ստացիր 20 HT ամեն մարդու համար</p>
+                <button class="action-btn btn-blue" onclick="shareRef()">ԿԻՍՎԵԼ ՀՂՈՒՄՈՎ</button>
+            </div>
+            <button id="withdrawBtn" class="action-btn btn-red" onclick="requestWithdraw()" disabled>ՀԱՆԵԼ ԳՈՒՄԱՐԸ</button>
+        </div>
+
+        <div class="nav-bar">
+            <div class="nav-item active" id="nav-game" onclick="switchTab('game')">ԽԱՂ</div>
+            <div class="nav-item" id="nav-daily" onclick="switchTab('daily')">ԲՈՆՈՒՍ</div>
+            <div class="nav-item" id="nav-wheel" onclick="switchTab('wheel')">ԱՆԻՎ</div>
+            <div class="nav-item" id="nav-shop" onclick="switchTab('shop')">ԽԱՆՈՒԹ</div>
+            <div class="nav-item" id="nav-cab" onclick="switchTab('cabinet')">ԷՋ</div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        let totalPoints = parseFloat(localStorage.getItem('totalPoints')) || 0;
+        let dailyDay = parseInt(localStorage.getItem('dailyDay')) || 1;
+        const rewards = [5, 10, 15, 20, 25, 30, 50];
+
+        // Էկրանների փոփոխություն
+        function switchTab(tab) {
+            // Թաքցնել բոլորը
+            const sections = document.querySelectorAll('.page-section');
+            sections.forEach(s => s.style.display = 'none');
+            
+            // Ցուցադրել ընտրվածը
+            const targetId = tab === 'game' ? 'game-section' : tab + '-section';
+            const target = document.getElementById(targetId);
+            if(target) target.style.display = 'block';
+
+            // Ակտիվացնել կոճակը նավիգացիայի մեջ
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('nav-' + tab).classList.add('active');
+
+            // Թարմացնել տվյալները ըստ բաժնի
+            if(tab === 'cabinet') updateStats();
+            if(tab === 'daily') renderDaily();
+            if(tab === 'wheel') drawWheel();
+        }
+
+        function updateStats() {
+            let tokens = (totalPoints / 100).toFixed(2);
+            document.getElementById('top-balance').innerText = Math.floor(tokens);
+            document.getElementById('ht-balance').innerText = tokens + " HT";
+            document.getElementById('amd-balance').innerText = Math.floor(tokens);
+            document.getElementById('withdrawBtn').disabled = (tokens < 1000);
+        }
+
+        // --- ՕՐԱԿԱՆ ԲՈՆՈՒՍԻ ՏՐԱՄԱԲԱՆՈՒԹՅՈՒՆ ---
+        function renderDaily() {
+            const grid = document.getElementById('dailyGrid');
+            grid.innerHTML = '';
+            rewards.forEach((res, i) => {
+                const dayNum = i + 1;
+                const div = document.createElement('div');
+                div.className = `daily-day ${dayNum === dailyDay ? 'active' : ''} ${dayNum < dailyDay ? 'claimed' : ''}`;
+                div.innerHTML = `Օր ${dayNum}<br><span style="font-size:22px">💎</span><br><b>${res} HT</b>`;
+                grid.appendChild(div);
+            });
+            updateDailyTimer();
+        }
+
+        function updateDailyTimer() {
+            const lastClaim = localStorage.getItem('lastDailyClaim') || 0;
+            const diff = 24*60*60*1000 - (Date.now() - lastClaim);
+            const btn = document.getElementById('claimDailyBtn');
+            const timerTxt = document.getElementById('dailyTimerText');
+
+            if (diff > 0) {
+                btn.disabled = true;
+                const h = Math.floor(diff/3600000);
+                const m = Math.floor((diff%3600000)/60000);
+                timerTxt.innerText = `Հաջորդը ${h}ժ ${m}ր-ից`;
+            } else {
+                btn.disabled = false;
+                timerTxt.innerText = "Նվերը պատրաստ է վերցնելու";
+            }
+        }
+
+        function claimDaily() {
+            totalPoints += rewards[dailyDay - 1] * 100;
+            localStorage.setItem('totalPoints', totalPoints);
+            localStorage.setItem('lastDailyClaim', Date.now());
+            dailyDay = dailyDay < 7 ? dailyDay + 1 : 1;
+            localStorage.setItem('dailyDay', dailyDay);
+            
+            tg.showPopup({ title: "Շնորհավոր!", message: "Դուք ստացաք ձեր օրական նվերը" });
+            renderDaily();
+            updateStats();
+        }
+
+        // --- ԱՆԻՎԻ ՏՐԱՄԱԲԱՆՈՒԹՅՈՒՆ ---
+        const prizes = [
+            { text: "10 HT", type: "ht", val: 10 },
+            { text: "1 Star", type: "star", val: 1 },
+            { text: "0 HT", type: "miss", val: 0 },
+            { text: "20 HT", type: "ht", val: 20 },
+            { text: "1 Star", type: "star", val: 1 },
+            { text: "5 HT", type: "ht", val: 5 }
+        ];
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const arc = (Math.PI * 2) / prizes.length;
+            prizes.forEach((p, i) => {
+                ctx.fillStyle = i % 2 === 0 ? "#1c2128" : "#f1c40f";
+                ctx.beginPath();
+                ctx.moveTo(125, 125);
+                ctx.arc(125, 125, 125, i * arc, (i + 1) * arc);
+                ctx.fill();
+                ctx.save();
+                ctx.translate(125, 125);
+                ctx.rotate(i * arc + arc / 2);
+                ctx.fillStyle = i % 2 === 0 ? "white" : "black";
+                ctx.font = "bold 13px Arial";
+                ctx.fillText(p.text, 65, 5);
+                ctx.restore();
+            });
+        }
+
+        function spinWheel() {
+            const last = localStorage.getItem('lastSpin') || 0;
+            if (Date.now() - last < 4*60*60*1000) return;
+
+            const deg = Math.floor(Math.random() * 360) + 3600;
+            document.getElementById('wheelCanvas').style.transform = `rotate(${deg}deg)`;
+            localStorage.setItem('lastSpin', Date.now());
+
+            setTimeout(() => {
+                const idx = Math.floor(((360 - (deg % 360) + 90) % 360) / (360 / prizes.length));
+                const p = prizes[idx];
+                if(p.type === 'ht') totalPoints += p.val * 100;
+                tg.showPopup({ title: "Անիվ", message: `Դուք շահեցիք ${p.text}` });
+                updateStats();
+            }, 4000);
+        }
+
+        // --- ԱՅԼ ՖՈՒՆԿՑԻԱՆԵՐ ---
+        function shareRef() {
+            const url = `https://t.me/MyCoinFMBot?start=${tg.initDataUnsafe?.user?.id || 0}`;
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=Միացիր ինձ MyCoinFM-ում!`);
+        }
+
+        function buyAction(item) {
+            tg.showPopup({ title: "Գնում", message: item + " գնելու համար գրեք ադմինին" }, () => {
+                tg.openTelegramLink("https://t.me/Edgar_Admin");
+            });
+        }
+
+        function requestWithdraw() {
+            const wallet = prompt("Մուտքագրեք Ձեր քարտի համարը կամ Idram-ը:");
+            if(wallet) tg.showPopup({ message: "Հայտը հաջողությամբ ուղարկվեց ադմինին:" });
+        }
+
+        function initAndStart() {
+            document.getElementById('startBtn').style.display = 'none';
+            // Այստեղ պետք է լինի խաղի ընթացքի կոդը
+        }
+
+        // Սկզբնական թարմացում
+        updateStats();
+        setInterval(updateDailyTimer, 60000); // Թարմացնել ժամաչափը ամեն րոպե
+    </script>
+</body>
+</html>
