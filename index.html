@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>MyCoinFM - Snake & Shop</title>
+    <title>Haytocen Snake VIP</title>
     <style>
         :root {
             --primary: #f1c40f;
@@ -12,196 +12,574 @@
             --surface: #1c2128;
             --text: #ffffff;
             --text-dim: #8b949e;
+            --canvas-bg: #111;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --gold-gradient: linear-gradient(135deg, #f1c40f 0%, #d4ac0d 100%);
+            --vip-gradient: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
         }
 
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-            overflow: hidden; touch-action: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            overflow: hidden; touch-action: none; -webkit-user-select: none;
         }
 
-        #main-wrapper { max-width: 500px; margin: auto; height: 100vh; display: flex; flex-direction: column; }
-
-        /* Шапка */
+        /* --- HEADER --- */
         .header { 
-            background: var(--surface); padding: 12px 15px; 
-            border-bottom: 2px solid var(--primary); display: flex; 
-            justify-content: space-between; align-items: center;
+            background: var(--surface); padding: 15px; border-bottom: 3px solid var(--primary); 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10;
+        }
+        .header-left { display: flex; gap: 15px; align-items: center; font-weight: 900; font-size: 18px; }
+        .progress-box { background: rgba(241, 196, 15, 0.2); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--primary); color: var(--primary); font-size: 14px; font-weight: bold; }
+        .mute-btn { cursor: pointer; font-size: 22px; margin-left: 5px; }
+
+        /* --- LAYOUT --- */
+        #main-wrapper { max-width: 500px; margin: auto; height: 100vh; display: flex; flex-direction: column; }
+        .page-section { display: none; flex-grow: 1; position: relative; padding: 20px; overflow-y: auto; flex-direction: column; align-items: center; }
+        
+        /* --- GAME --- */
+        .canvas-wrapper {
+            position: relative;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        canvas { display: block; background: var(--canvas-bg); border: 4px solid var(--primary); border-radius: 12px; width: 100%; max-width: 340px; }
+        
+        /* Controls */
+        .controls { display: grid; grid-template-columns: repeat(3, 70px); gap: 12px; margin-top: 10px; }
+        .ctrl-btn { width: 70px; height: 65px; background: var(--surface); border: 2px solid #444; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--primary); box-shadow: 0 5px 0 #000; transition: transform 0.1s; }
+        .ctrl-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #000; }
+
+        /* --- WHEEL (FIXED) --- */
+        .wheel-container { display: flex; flex-direction: column; align-items: center; gap: 30px; margin-top: 20px; }
+        .wheel-outer { position: relative; width: 320px; height: 320px; border-radius: 50%; border: 12px solid var(--surface); box-shadow: 0 0 25px rgba(241, 196, 15, 0.3); overflow: hidden; }
+        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 40px; height: 50px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 25; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        
+        #wheel {
+            width: 100%; height: 100%; border-radius: 50%;
+            transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); /* Плавное вращение */
+            position: relative;
+            background: conic-gradient(
+                #f1c40f 0deg 45deg,      #2c3e50 45deg 90deg, 
+                #f39c12 90deg 135deg,    #34495e 135deg 180deg, 
+                #d4ac0d 180deg 225deg,   #2c3e50 225deg 270deg, 
+                #e67e22 270deg 315deg,   #8e44ad 315deg 360deg
+            );
         }
 
-        /* Секции */
-        .page-section { display: none; flex-grow: 1; padding: 15px; overflow-y: auto; }
-        #game-section { display: flex; flex-direction: column; align-items: center; background: #161b22; }
-
-        /* Магазин */
-        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .shop-card { 
-            background: var(--surface); border: 1px solid #30363d; 
-            border-radius: 12px; padding: 15px; text-align: center; 
+        .wheel-label {
+            position: absolute; top: 50%; left: 50%; width: 50%; height: 20px;
+            margin-top: -10px; transform-origin: left center;
+            display: flex; align-items: center; justify-content: flex-end;
+            font-weight: 900; font-size: 13px; padding-right: 20px; box-sizing: border-box;
+            color: #fff; text-shadow: 1px 1px 2px #000;
         }
-        .buy-btn { 
-            margin-top: 10px; width: 100%; padding: 8px; 
-            background: var(--primary); border: none; border-radius: 8px; font-weight: bold; 
+        /* Углы для 8 секторов (смещение 22.5 чтобы текст был по центру) */
+        .l1 { transform: rotate(22.5deg); color: #000; text-shadow: none; }
+        .l2 { transform: rotate(67.5deg); }
+        .l3 { transform: rotate(112.5deg); color: #000; text-shadow: none; }
+        .l4 { transform: rotate(157.5deg); }
+        .l5 { transform: rotate(202.5deg); color: #000; text-shadow: none; }
+        .l6 { transform: rotate(247.5deg); }
+        .l7 { transform: rotate(292.5deg); color: #000; text-shadow: none; }
+        .l8 { transform: rotate(337.5deg); }
+
+        .spin-btn { background: var(--gold-gradient); color: #000; border: none; padding: 18px 50px; border-radius: 40px; font-weight: 900; font-size: 20px; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.5); cursor: pointer; }
+        .spin-btn:disabled { background: #555; filter: grayscale(1); cursor: not-allowed; }
+
+        /* --- SHOP & CARDS --- */
+        .card { background: var(--surface); padding: 20px; border-radius: 16px; width: 100%; margin-bottom: 15px; border: 1px solid #333; box-sizing: border-box; }
+        .shop-desc { font-size: 13px; color: #aaa; margin-bottom: 15px; line-height: 1.4; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 3px solid var(--primary); }
+        .shop-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .buy-btn { background: #0088cc; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* --- NAV BAR --- */
+        .nav-bar { 
+            display: flex; background: var(--surface); padding: 12px 0 30px; 
+            border-top: 2px solid #333; height: 90px;
         }
+        .nav-item { flex: 1; text-align: center; color: var(--text-dim); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .nav-item span { font-size: 24px; margin-bottom: 5px; }
+        .nav-item div { font-size: 12px; font-weight: 800; text-transform: uppercase; }
+        .nav-item.active { color: var(--primary); transform: scale(1.1); transition: transform 0.2s; }
 
-        /* Канвас */
-        canvas { background: #000; border: 2px solid #30363d; border-radius: 8px; width: 100%; max-width: 300px; }
-
-        /* Управление */
-        .controls { display: grid; grid-template-columns: repeat(3, 60px); gap: 10px; margin-top: 15px; }
-        .ctrl-btn { 
-            width: 60px; height: 60px; background: #21262d; border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 24px;
-        }
-        .ctrl-up { grid-column: 2; }
-        .ctrl-left { grid-column: 1; }
-        .ctrl-right { grid-column: 3; }
-        .ctrl-down { grid-column: 2; }
-
-        /* Навигация */
-        .nav-bar { display: flex; background: var(--surface); padding: 10px 0 20px 0; border-top: 1px solid #30363d; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; color: var(--text-dim); }
-        .nav-item.active { color: var(--primary); }
-        .nav-item span { display: block; font-size: 20px; }
+        /* --- OVERLAYS --- */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; }
+        .btn-main { padding: 15px 40px; border-radius: 12px; border: none; background: var(--primary); font-weight: 900; font-size: 18px; color: #000; cursor: pointer; margin-top: 20px; }
+        
+        .floating-gift { animation: float 1s infinite alternate ease-in-out; }
+        @keyframes float { from { transform: translateY(0); } to { transform: translateY(-5px); } }
     </style>
 </head>
-<body>
+<body id="game-body">
     <div id="main-wrapper">
         <div class="header">
-            <span>🐍 <span id="score">0</span></span>
-            <span style="color: var(--primary);"><span id="balance">0</span> HT</span>
+            <div class="header-left">
+                <span>🐍 <span id="score">0</span></span>
+                <span class="mute-btn" onclick="toggleMute()" id="muteIcon">🔇</span>
+            </div>
+            <div>
+                <div style="text-align: right;">
+                    <span style="font-size: 11px; opacity: 0.7;">БАЛАНС</span><br>
+                    <span style="color: var(--primary); font-weight: 900; font-size: 16px;"><span id="balance">0</span> HT</span>
+                </div>
+            </div>
         </div>
 
         <div id="game-section" class="page-section" style="display: flex;">
-            <button id="startBtn" style="padding: 15px 30px; background: var(--primary); border:none; border-radius:10px; margin-top: 20px;" onclick="startGame()">ИГРАТЬ</button>
-            <canvas id="gameCanvas" style="margin-top: 20px;"></canvas>
+            <div class="shop-desc" style="text-align: center; width: 90%;">
+                Собери 40 очков для следующего уровня!
+            </div>
+            
+            <button id="startBtn" class="btn-main" onclick="startGame()">ИГРАТЬ</button>
+            
+            <div class="canvas-wrapper">
+                <canvas id="gameCanvas" width="320" height="320"></canvas>
+            </div>
+
             <div class="controls">
-                <div class="ctrl-btn ctrl-up" onclick="setDirection('UP')">▲</div>
-                <div class="ctrl-btn ctrl-left" onclick="setDirection('LEFT')">◀</div>
-                <div class="ctrl-btn ctrl-right" onclick="setDirection('RIGHT')">▶</div>
-                <div class="ctrl-btn ctrl-down" onclick="setDirection('DOWN')">▼</div>
+                <div class="ctrl-btn" style="grid-column:2" onpointerdown="setDirection('UP')">▲</div>
+                <div class="ctrl-btn" style="grid-column:1; grid-row:2" onpointerdown="setDirection('LEFT')">◀</div>
+                <div class="ctrl-btn" style="grid-column:3; grid-row:2" onpointerdown="setDirection('RIGHT')">▶</div>
+                <div class="ctrl-btn" style="grid-column:2; grid-row:3" onpointerdown="setDirection('DOWN')">▼</div>
+            </div>
+        </div>
+
+        <div id="wheel-section" class="page-section">
+            <div class="wheel-container">
+                <h2 style="color: var(--primary); margin: 0; font-size: 28px; text-transform: uppercase;">Колесо Удачи</h2>
+                <div class="wheel-outer">
+                    <div class="wheel-pointer"></div>
+                    <div id="wheel">
+                        <div class="wheel-label l1">1 HT</div>
+                        <div class="wheel-label l2">0 HT</div>
+                        <div class="wheel-label l3">ЕЩЁ!</div>
+                        <div class="wheel-label l4">1 ⭐</div>
+                        <div class="wheel-label l5">5 HT</div>
+                        <div class="wheel-label l6">10 HT</div>
+                        <div class="wheel-label l7">25 HT</div>
+                        <div class="wheel-label l8">VIP 1Д</div>
+                    </div>
+                </div>
+                <button id="spinBtn" class="spin-btn" onclick="spinWheel()">КРУТИТЬ</button>
+                <p id="wheel-msg" style="color: var(--primary); font-weight: bold; min-height: 24px; text-align: center; font-size: 18px;"></p>
             </div>
         </div>
 
         <div id="shop-section" class="page-section">
-            <h2 style="text-align:center">Магазин Stars</h2>
-            <div class="shop-grid">
-                <div class="shop-card">
-                    <div>💰 100 HT</div>
-                    <div style="color:var(--primary)">10 ⭐</div>
-                    <button class="buy-btn" onclick="requestPay(100, 10)">КУПИТЬ</button>
+            <h2 style="text-align: center; color: var(--primary);">💎 VIP МАГАЗИН</h2>
+            
+            <div class="card" style="border: 2px solid var(--primary); background: rgba(241, 196, 15, 0.05);">
+                <h3 style="margin-top: 0; color: var(--success);">ПРЕИМУЩЕСТВА VIP:</h3>
+                <ul style="padding-left: 20px; line-height: 1.6; font-size: 14px; color: #ddd;">
+                    <li><b>2x Бонусы</b> в игре (сбор очков)</li>
+                    <li><b>2x Умножение</b> выигрыша в Колесе</li>
+                    <li><b>2x Награда</b> в Ежедневном боксе</li>
+                    <li>💰 Вывод средств от <b>2500 HT</b></li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="shop-item">
+                    <div><b>5 ДНЕЙ VIP</b><br><small>Пробный период</small></div>
+                    <button class="buy-btn" onclick="buyVip(5, 20)">20 ⭐</button>
                 </div>
-                <div class="shop-card">
-                    <div>💎 500 HT</div>
-                    <div style="color:var(--primary)">50 ⭐</div>
-                    <button class="buy-btn" onclick="requestPay(500, 50)">КУПИТЬ</button>
+                <div class="shop-item">
+                    <div style="color: var(--primary);"><b>15 ДНЕЙ VIP</b><br><small>Выгодный старт</small></div>
+                    <button class="buy-btn" onclick="buyVip(15, 150)">150 ⭐</button>
+                </div>
+                <div class="shop-item">
+                    <div style="color: #e74c3c;"><b>30 ДНЕЙ VIP</b><br><small>Максимальный профит</small></div>
+                    <button class="buy-btn" onclick="buyVip(30, 500)">500 ⭐</button>
                 </div>
             </div>
         </div>
 
+        <div id="bonus-section" class="page-section">
+            <div class="card" style="text-align: center; margin-top: 50px;">
+                <h2>Ежедневный бокс</h2>
+                <div class="floating-gift" style="font-size: 80px; margin: 20px;">🎁</div>
+                <button id="claimBtn" class="btn-main" style="width:100%;" onclick="claimDailyBonus()">ОТКРЫТЬ</button>
+                <p id="bonus-msg" style="margin-top: 15px; font-weight: bold;"></p>
+            </div>
+        </div>
+
+        <div id="profile-section" class="page-section">
+            <h2 style="text-align: center;">ПРОФИЛЬ</h2>
+            <div class="card" style="text-align: center;">
+                <p>Ваш баланс:</p>
+                <h1 style="color: var(--primary); font-size: 40px; margin: 10px 0;"><span id="profile-balance">0</span> HT</h1>
+                <p id="vip-status-profile" style="font-weight: bold; font-size: 18px;"></p>
+                <div style="font-size: 13px; color: #888;" id="vip-timer"></div>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--accent);">
+                <h3>💳 Вывод средств</h3>
+                <p style="font-size: 14px;">Лимит для вывода: <span id="withdraw-limit">5000</span> HT</p>
+                <button class="btn-main" style="width: 100%; background: #333; color: #777; font-size: 14px;" onclick="alert('Недостаточно средств!')">ВЫВЕСТИ</button>
+            </div>
+        </div>
+
         <div class="nav-bar">
-            <div class="nav-item active" onclick="showTab('game')"><span>🎮</span>ИГРА</div>
-            <div class="nav-item" onclick="showTab('shop')"><span>🛒</span>ШОП</div>
+            <div id="nav-game" class="nav-item active" onclick="showTab('game')"><span>🎮</span><div>ИГРА</div></div>
+            <div id="nav-bonus" class="nav-item" onclick="showTab('bonus')"><span>💎</span><div>БОНУС</div></div>
+            <div id="nav-wheel" class="nav-item" onclick="showTab('wheel')"><span>🎡</span><div>УДАЧА</div></div>
+            <div id="nav-shop" class="nav-item" onclick="showTab('shop')"><span>🛒</span><div>VIP</div></div>
+            <div id="nav-profile" class="nav-item" onclick="showTab('profile')"><span>👤</span><div>Я</div></div>
         </div>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+    <div id="modal" class="overlay">
+        <h2 style="color: #e74c3c;">ИГРА ОКОНЧЕНА</h2>
+        <p id="end-score" style="font-size: 24px; color: #fff;"></p>
+        <button class="btn-main" onclick="closeModal()">ЗАНОВО</button>
+    </div>
 
-        let points = parseInt(localStorage.getItem('ht_balance')) || 0;
-        let score = 0;
+    <script>
+        // --- AUDIO ENGINE (MIDI STYLE) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let isMuted = true; // По умолчанию выкл, чтобы не пугать
+        let noteTimeout;
+        
+        // Простая мелодия
+        const melody = [
+            {f: 330, d: 200}, {f: 330, d: 200}, {f: 349, d: 200}, {f: 392, d: 400},
+            {f: 392, d: 200}, {f: 349, d: 200}, {f: 330, d: 200}, {f: 294, d: 200},
+            {f: 262, d: 200}, {f: 262, d: 200}, {f: 294, d: 200}, {f: 330, d: 300},
+            {f: 294, d: 100}, {f: 294, d: 400}
+        ];
+        let noteIndex = 0;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('muteIcon').innerText = isMuted ? '🔇' : '🔊';
+            if(!isMuted && audioCtx.state === 'suspended') audioCtx.resume();
+            if(!isMuted && isRunning) playMusic();
+            else clearTimeout(noteTimeout);
+        }
+
+        function playTone(freq, duration, type='square') {
+            if(isMuted) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration/1000);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration/1000);
+        }
+
+        function playMusic() {
+            if(isMuted || !isRunning) return;
+            const note = melody[noteIndex % melody.length];
+            playTone(note.f, note.d);
+            noteIndex++;
+            noteTimeout = setTimeout(playMusic, note.d);
+        }
+
+        // --- GAME LOGIC ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const box = 15;
-        canvas.width = 300;
-        canvas.height = 300;
+        const box = 20; // Размер клетки
+        const rows = canvas.height / box;
+        const cols = canvas.width / box;
 
-        let snake, food, d, gameLoop;
+        let snake = [], food = {}, gift = { active: false, x: 0, y: 0, timer: 0, nextSpawn: 0 };
+        let d, gameLoop, points = parseInt(localStorage.getItem('ht_balance')) || 0;
+        let isRunning = false;
+        
+        // VIP Logic
+        let vipExpiry = parseInt(localStorage.getItem('vipExpiry')) || 0;
+        let isVip = false;
 
-        function updateUI() {
-            document.getElementById('balance').innerText = points;
-            document.getElementById('score').innerText = score;
+        function initGame() {
+            snake = [{x: 5*box, y: 10*box}, {x: 4*box, y: 10*box}, {x: 3*box, y: 10*box}];
+            food = spawnItem();
+            d = "RIGHT"; 
+            
+            // Gift logic reset
+            gift.active = false;
+            gift.nextSpawn = Date.now() + 15000; // Появится через 15 сек
+
+            checkVip(); updateUI();
+            noteIndex = 0;
         }
 
-        function showTab(id) {
-            document.querySelectorAll('.page-section').forEach(s => s.style.display = 'none');
-            document.getElementById(id + '-section').style.display = (id === 'game' ? 'flex' : 'block');
-        }
-
-        // Заглушка для оплаты (пока нет сервера)
-        function requestPay(amount, stars) {
-            tg.showConfirm(`Купить ${amount} HT за ${stars} звёзд?`, (ok) => {
-                if(ok) {
-                    points += amount;
-                    localStorage.setItem('ht_balance', points);
-                    updateUI();
-                    tg.showAlert("Оплата (тест) прошла!");
-                }
-            });
+        function spawnItem() {
+            return {
+                x: Math.floor(Math.random() * cols) * box,
+                y: Math.floor(Math.random() * rows) * box
+            };
         }
 
         function startGame() {
             document.getElementById('startBtn').style.display = 'none';
-            snake = [{x: 10 * box, y: 10 * box}];
-            d = "UP";
-            score = 0;
-            generateFood();
-            if(gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(draw, 150);
+            isRunning = true;
+            if(!isMuted) {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                playMusic();
+            }
+            initGame();
+            run();
         }
 
-        function generateFood() {
-            food = {
-                x: Math.floor(Math.random() * 20) * box,
-                y: Math.floor(Math.random() * 20) * box
-            };
-        }
+        function run() {
+            if(!isRunning) return;
 
-        function setDirection(dir) { d = dir; }
+            // Logic Gift
+            const now = Date.now();
+            if (!gift.active && now > gift.nextSpawn) {
+                // Появление подарка
+                gift.x = Math.floor(Math.random() * cols) * box;
+                gift.y = Math.floor(Math.random() * rows) * box;
+                gift.active = true;
+                gift.timer = now + 7000; // Исчезнет через 7 сек
+                playTone(600, 300, 'sine'); // Звук появления
+            }
+            if (gift.active && now > gift.timer) {
+                // Исчезновение
+                gift.active = false;
+                gift.nextSpawn = now + 15000;
+            }
+
+            // Move Snake
+            let hx = snake[0].x, hy = snake[0].y;
+            if(d=="LEFT") hx -= box; if(d=="UP") hy -= box;
+            if(d=="RIGHT") hx += box; if(d=="DOWN") hy += box;
+
+            // Collision Check
+            if(hx < 0 || hx >= canvas.width || hy < 0 || hy >= canvas.height || snake.some(s => s.x === hx && s.y === hy)) {
+                endGame(); return;
+            }
+
+            // Eat Food (Apple)
+            if(hx === food.x && hy === food.y) {
+                points += isVip ? 2 : 1; 
+                playTone(800, 100, 'triangle');
+                food = spawnItem();
+            } else {
+                snake.pop(); // Remove tail
+            }
+
+            // Eat Gift
+            if(gift.active && hx === gift.x && hy === gift.y) {
+                points += isVip ? 10 : 5; // Бонус за подарок
+                playTone(1000, 400, 'square'); // Звук бонуса
+                gift.active = false;
+                gift.nextSpawn = now + 15000;
+            }
+
+            snake.unshift({x: hx, y: hy}); // Add Head
+
+            draw();
+            updateUI();
+            setTimeout(run, 150); // Скорость игры
+        }
 
         function draw() {
-            ctx.fillStyle = "black";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Background
+            ctx.fillStyle = "#111"; ctx.fillRect(0,0,canvas.width,canvas.height);
+            
+            // Grid (optional, for style)
+            ctx.strokeStyle = "#222"; ctx.lineWidth = 1;
+            for(let i=0; i<cols; i++) { ctx.beginPath(); ctx.moveTo(i*box,0); ctx.lineTo(i*box,canvas.height); ctx.stroke(); }
+            for(let i=0; i<rows; i++) { ctx.beginPath(); ctx.moveTo(0,i*box); ctx.lineTo(canvas.width,i*box); ctx.stroke(); }
 
+            // Draw Snake
             for(let i=0; i<snake.length; i++) {
-                ctx.fillStyle = (i === 0) ? "#f1c40f" : "#2ecc71";
-                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                if(i == 0) {
+                    // Head 🐍
+                    ctx.font = "20px Arial";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText("🐍", snake[i].x + box/2, snake[i].y + box/2 + 2);
+                } else {
+                    // Body
+                    ctx.fillStyle = "#2ecc71";
+                    ctx.beginPath();
+                    ctx.arc(snake[i].x + box/2, snake[i].y + box/2, box/2 - 2, 0, Math.PI*2);
+                    ctx.fill();
+                }
             }
 
-            ctx.fillStyle = "red";
-            ctx.fillRect(food.x, food.y, box, box);
+            // Draw Food 🍎
+            ctx.font = "20px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("🍎", food.x + box/2, food.y + box/2 + 2);
 
-            let headX = snake[0].x;
-            let headY = snake[0].y;
-
-            if(d === "LEFT") headX -= box;
-            if(d === "UP") headY -= box;
-            if(d === "RIGHT") headX += box;
-            if(d === "DOWN") headY += box;
-
-            if(headX === food.x && headY === food.y) {
-                score++;
-                points++;
-                localStorage.setItem('ht_balance', points);
-                generateFood();
-                updateUI();
-            } else {
-                snake.pop();
+            // Draw Gift 🎁
+            if(gift.active) {
+                ctx.fillText("🎁", gift.x + box/2, gift.y + box/2 + 2);
             }
-
-            let newHead = {x: headX, y: headY};
-
-            if(headX < 0 || headX >= canvas.width || headY < 0 || headY >= canvas.height) {
-                clearInterval(gameLoop);
-                document.getElementById('startBtn').style.display = 'block';
-                tg.showAlert("Игра окончена!");
-            }
-
-            snake.unshift(newHead);
         }
 
-        updateUI();
+        function setDirection(dir) {
+            if(dir=="UP" && d!="DOWN") d="UP";
+            if(dir=="DOWN" && d!="UP") d="DOWN";
+            if(dir=="LEFT" && d!="RIGHT") d="LEFT";
+            if(dir=="RIGHT" && d!="LEFT") d="RIGHT";
+        }
+
+        function endGame() {
+            isRunning = false;
+            clearTimeout(noteTimeout);
+            playTone(150, 500, 'sawtooth');
+            document.getElementById('end-score').innerText = "Твой счет: " + (snake.length-3);
+            document.getElementById('modal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; document.getElementById('startBtn').style.display = 'block'; }
+
+        // --- WHEEL LOGIC (FIXED ROTATION) ---
+        let currentRotation = 0;
+        let canSpin = true;
+
+        function spinWheel() {
+            if(!canSpin) return;
+
+            // Cooldown check (4 hours)
+            const lastSpin = parseInt(localStorage.getItem('lastSpinTime')) || 0;
+            if(Date.now() - lastSpin < 14400000) {
+                alert("Колесо отдыхает! Приходи через 4 часа.");
+                return;
+            }
+
+            canSpin = false;
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('wheel-msg').innerText = "Крутим...";
+            playTone(400, 200);
+
+            // 8 Sectors
+            const sectors = [
+                { val: 1, type: 'ht' }, { val: 0, type: 'zero' },
+                { val: 0, type: 'again' }, { val: 0, type: 'star' },
+                { val: 5, type: 'ht' }, { val: 10, type: 'ht' },
+                { val: 25, type: 'ht' }, { val: 1, type: 'vip' }
+            ];
+            
+            // Random Logic
+            const winIndex = Math.floor(Math.random() * 8);
+            const win = sectors[winIndex];
+
+            // Calculate rotation: 
+            // 8 sectors = 45deg each.
+            // Index 0 is at 0-45deg. To point to it at the top, we rotate the wheel so that sector is at the top pointer.
+            // However, CSS conic gradient starts at 0 (top/12 o'clock).
+            // A simple way is to just rotate random degrees + lots of spins.
+            
+            const spinRounds = 360 * 5; // 5 full spins
+            const sectorAngle = 45;
+            // Target angle to land the specific sector under the pointer (pointer is at top)
+            // Need to invert the index because wheel spins clockwise
+            const targetAngle = (360 - (winIndex * sectorAngle)) - (sectorAngle / 2); 
+            
+            // Add to current rotation so it doesn't reset
+            currentRotation += spinRounds + targetAngle;
+            
+            // Fix alignment issue by adding random deviation inside sector
+            const randomOffset = Math.floor(Math.random() * 20) - 10;
+            
+            document.getElementById('wheel').style.transform = `rotate(${currentRotation + randomOffset}deg)`;
+
+            setTimeout(() => {
+                let msg = "";
+                if(win.type === 'ht') {
+                    let amt = isVip ? win.val * 2 : win.val;
+                    points += amt;
+                    msg = `+${amt} HT`;
+                    localStorage.setItem('lastSpinTime', Date.now());
+                } else if(win.type === 'vip') {
+                    activateVip(1);
+                    msg = "VIP на 1 день!";
+                    localStorage.setItem('lastSpinTime', Date.now());
+                } else if(win.type === 'again') {
+                    msg = "Крути еще раз!";
+                    // No timer set
+                } else if(win.type === 'zero') {
+                    msg = "Пусто :(";
+                    localStorage.setItem('lastSpinTime', Date.now());
+                } else {
+                    msg = "Звезда Telegram!";
+                    localStorage.setItem('lastSpinTime', Date.now());
+                }
+
+                document.getElementById('wheel-msg').innerText = msg;
+                playTone(600, 500, 'square'); // Win sound
+                canSpin = true;
+                document.getElementById('spinBtn').disabled = false;
+                updateUI();
+            }, 5000); // Matches CSS transition time
+        }
+
+        // --- GENERAL UI & VIP ---
+        function checkVip() {
+            if(Date.now() < vipExpiry) {
+                isVip = true;
+                const days = Math.ceil((vipExpiry - Date.now()) / (1000 * 60 * 60 * 24));
+                document.getElementById('vip-status-profile').innerHTML = `<span style="color:#2ecc71">✨ VIP АКТИВЕН (${days} дн.)</span>`;
+                document.getElementById('withdraw-limit').innerText = "2500";
+                document.body.style.background = "#1a0b1f"; // Purple tint bg
+            } else {
+                isVip = false;
+                document.getElementById('vip-status-profile').innerText = "Обычный аккаунт";
+                document.getElementById('withdraw-limit').innerText = "5000";
+                document.body.style.background = "#0b0e11";
+            }
+        }
+
+        function activateVip(days) {
+            const ms = days * 24 * 60 * 60 * 1000;
+            // If already VIP, add time, else set new
+            if (Date.now() < vipExpiry) {
+                vipExpiry += ms;
+            } else {
+                vipExpiry = Date.now() + ms;
+            }
+            localStorage.setItem('vipExpiry', vipExpiry);
+            checkVip();
+            updateUI();
+        }
+
+        function buyVip(days, cost) {
+            if(confirm(`Купить VIP на ${days} дней за ${cost} звезд?`)) {
+                // Here you would integrate Telegram Stars payment
+                alert("Симуляция: Оплата прошла успешно!");
+                activateVip(days);
+            }
+        }
+
+        function claimDailyBonus() {
+            const today = new Date().toDateString();
+            if(localStorage.getItem('lastBonus') === today) {
+                document.getElementById('bonus-msg').innerText = "Заходи завтра!";
+                return;
+            }
+            let amt = isVip ? 50 : 25;
+            points += amt;
+            localStorage.setItem('lastBonus', today);
+            document.getElementById('bonus-msg').innerText = `Получено +${amt} HT!`;
+            updateUI();
+        }
+
+        function updateUI() {
+            localStorage.setItem('ht_balance', points);
+            document.getElementById('balance').innerText = points;
+            document.getElementById('profile-balance').innerText = points;
+            document.getElementById('score').innerText = snake ? snake.length-3 : 0;
+        }
+
+        function showTab(t) {
+            document.querySelectorAll('.page-section').forEach(e => e.style.display='none');
+            document.getElementById(t+'-section').style.display = t==='game'?'flex':'flex';
+            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById('nav-'+t).classList.add('active');
+        }
+
+        // Init
+        window.onload = () => { initGame(); showTab('game'); };
     </script>
 </body>
 </html>
