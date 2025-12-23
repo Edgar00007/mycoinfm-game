@@ -15,211 +15,197 @@
             --canvas-bg: #111;
             --accent: #e74c3c;
             --success: #2ecc71;
-            --gold-gradient: linear-gradient(135deg, #f1c40f 0%, #d4ac0d 100%);
-            --vip-gradient: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+            --btn-blue: #3498db;
         }
 
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
-            overflow: hidden; touch-action: none; -webkit-user-select: none;
+            overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none;
+            height: 100dvh;
         }
 
-        /* --- HEADER --- */
+        #main-wrapper { max-width: 500px; margin: auto; height: 100%; display: flex; flex-direction: column; }
+
         .header { 
-            background: var(--surface); padding: 15px; border-bottom: 3px solid var(--primary); 
+            background: var(--surface); padding: 0 15px; border-bottom: 2px solid var(--primary); 
             display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10;
+            height: 50px; flex-shrink: 0; z-index: 10;
         }
         .header-left { display: flex; gap: 15px; align-items: center; font-weight: 900; font-size: 18px; }
-        .progress-box { background: rgba(241, 196, 15, 0.2); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--primary); color: var(--primary); font-size: 14px; font-weight: bold; }
-        .mute-btn { cursor: pointer; font-size: 22px; margin-left: 5px; }
 
-        /* --- LAYOUT --- */
-        #main-wrapper { max-width: 500px; margin: auto; height: 100vh; display: flex; flex-direction: column; }
-        .page-section { display: none; flex-grow: 1; position: relative; padding: 20px; overflow-y: auto; flex-direction: column; align-items: center; }
-        
-        /* --- GAME --- */
-        .canvas-wrapper {
-            position: relative;
-            margin: 20px 0;
-            border-radius: 12px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        .content-area { flex-grow: 1; position: relative; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+        .page-section { display: none; width: 100%; min-height: 100%; flex-direction: column; align-items: center; }
+
+        /* GAME */
+        #game-section { height: 100%; overflow: hidden; justify-content: space-between; padding-bottom: 10px; box-sizing: border-box; }
+        .game-info { text-align: center; font-size: 12px; color: #aaa; padding: 5px; background: rgba(0,0,0,0.2); width: 100%; }
+        .canvas-container { flex-grow: 1; width: 100%; display: flex; align-items: center; justify-content: center; position: relative; padding: 10px; box-sizing: border-box; }
+        .canvas-wrapper { position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.5); border-radius: 8px; }
+        canvas { display: block; background: var(--canvas-bg); border: 2px solid var(--primary); border-radius: 8px; }
+        .start-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); border-radius: 8px; display: flex; align-items: center; justify-content: center; z-index: 20; }
+        .controls-area { flex-shrink: 0; display: flex; justify-content: center; margin-bottom: 5px; }
+        .controls { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(2, 50px); gap: 6px; }
+        .ctrl-btn { width: 100%; height: 100%; background: var(--surface); border: 1px solid #444; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--primary); box-shadow: 0 3px 0 #000; touch-action: manipulation; }
+        .ctrl-btn:active { transform: translateY(3px); box-shadow: 0 0 0; background: #2a2f38; }
+
+        /* WHEEL */
+        .wheel-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 20px; }
+        .wheel-outer { position: relative; width: 280px; height: 280px; border-radius: 50%; border: 8px solid var(--surface); overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 40px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 25; }
+        #wheel { 
+            width: 100%; height: 100%; border-radius: 50%; position: relative;
+            transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); 
+            background: conic-gradient(#f1c40f 0deg 45deg, #2c3e50 45deg 90deg, #f39c12 90deg 135deg, #34495e 135deg 180deg, #d4ac0d 180deg 225deg, #2c3e50 225deg 270deg, #e67e22 270deg 315deg, #8e44ad 315deg 360deg);
         }
-        canvas { display: block; background: var(--canvas-bg); border: 4px solid var(--primary); border-radius: 12px; width: 100%; max-width: 340px; }
+        .wheel-label { position: absolute; top: 50%; left: 50%; width: 50%; height: 20px; margin-top: -10px; transform-origin: left center; display: flex; align-items: center; justify-content: flex-end; font-weight: 900; font-size: 12px; padding-right: 25px; box-sizing: border-box; color: #fff; text-shadow: 1px 1px 2px #000; }
+        .l1 { transform: rotate(22.5deg); color: #000; text-shadow: none; } .l2 { transform: rotate(67.5deg); } .l3 { transform: rotate(112.5deg); color: #000; text-shadow: none; } .l4 { transform: rotate(157.5deg); } .l5 { transform: rotate(202.5deg); color: #000; text-shadow: none; } .l6 { transform: rotate(247.5deg); } .l7 { transform: rotate(292.5deg); color: #000; text-shadow: none; } .l8 { transform: rotate(337.5deg); }
+
+        /* GENERAL */
+        .scrollable-content { padding: 15px; width: 100%; box-sizing: border-box; }
+        .card { background: var(--surface); padding: 15px; border-radius: 16px; width: 100%; margin-bottom: 12px; border: 1px solid #333; box-sizing: border-box; }
+        .btn-main { padding: 10px 25px; border-radius: 10px; border: none; background: var(--primary); font-weight: 900; font-size: 14px; color: #000; cursor: pointer; }
+        .btn-main:disabled { background: #444; color: #777; cursor: not-allowed; opacity: 0.5; }
         
-        /* Controls */
-        .controls { display: grid; grid-template-columns: repeat(3, 70px); gap: 12px; margin-top: 10px; }
-        .ctrl-btn { width: 70px; height: 65px; background: var(--surface); border: 2px solid #444; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--primary); box-shadow: 0 5px 0 #000; transition: transform 0.1s; }
-        .ctrl-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #000; }
+        /* Кнопка "Купить" */
+        .btn-buy { padding: 8px 20px; border-radius: 10px; border: none; background: var(--btn-blue); font-weight: 900; font-size: 14px; color: #fff; cursor: pointer; box-shadow: 0 3px 0 #1e5a82; }
+        .btn-buy:active { transform: translateY(2px); box-shadow: none; }
 
-        /* --- WHEEL (FIXED) --- */
-        .wheel-container { display: flex; flex-direction: column; align-items: center; gap: 30px; margin-top: 20px; }
-        .wheel-outer { position: relative; width: 320px; height: 320px; border-radius: 50%; border: 12px solid var(--surface); box-shadow: 0 0 25px rgba(241, 196, 15, 0.3); overflow: hidden; }
-        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 40px; height: 50px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 25; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-        
-        #wheel {
-            width: 100%; height: 100%; border-radius: 50%;
-            transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); /* Плавное вращение */
-            position: relative;
-            background: conic-gradient(
-                #f1c40f 0deg 45deg,      #2c3e50 45deg 90deg, 
-                #f39c12 90deg 135deg,    #34495e 135deg 180deg, 
-                #d4ac0d 180deg 225deg,   #2c3e50 225deg 270deg, 
-                #e67e22 270deg 315deg,   #8e44ad 315deg 360deg
-            );
-        }
+        /* Кнопка "Вывести" (Зеленая когда активна) */
+        .btn-withdraw { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--success); font-weight: 900; font-size: 16px; color: #000; cursor: pointer; margin-top: 10px; }
+        .btn-withdraw:disabled { background: #444; color: #777; cursor: not-allowed; }
 
-        .wheel-label {
-            position: absolute; top: 50%; left: 50%; width: 50%; height: 20px;
-            margin-top: -10px; transform-origin: left center;
-            display: flex; align-items: center; justify-content: flex-end;
-            font-weight: 900; font-size: 13px; padding-right: 20px; box-sizing: border-box;
-            color: #fff; text-shadow: 1px 1px 2px #000;
-        }
-        /* Углы для 8 секторов (смещение 22.5 чтобы текст был по центру) */
-        .l1 { transform: rotate(22.5deg); color: #000; text-shadow: none; }
-        .l2 { transform: rotate(67.5deg); }
-        .l3 { transform: rotate(112.5deg); color: #000; text-shadow: none; }
-        .l4 { transform: rotate(157.5deg); }
-        .l5 { transform: rotate(202.5deg); color: #000; text-shadow: none; }
-        .l6 { transform: rotate(247.5deg); }
-        .l7 { transform: rotate(292.5deg); color: #000; text-shadow: none; }
-        .l8 { transform: rotate(337.5deg); }
-
-        .spin-btn { background: var(--gold-gradient); color: #000; border: none; padding: 18px 50px; border-radius: 40px; font-weight: 900; font-size: 20px; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.5); cursor: pointer; }
-        .spin-btn:disabled { background: #555; filter: grayscale(1); cursor: not-allowed; }
-
-        /* --- SHOP & CARDS --- */
-        .card { background: var(--surface); padding: 20px; border-radius: 16px; width: 100%; margin-bottom: 15px; border: 1px solid #333; box-sizing: border-box; }
-        .shop-desc { font-size: 13px; color: #aaa; margin-bottom: 15px; line-height: 1.4; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 3px solid var(--primary); }
         .shop-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .buy-btn { background: #0088cc; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* --- NAV BAR --- */
-        .nav-bar { 
-            display: flex; background: var(--surface); padding: 12px 0 30px; 
-            border-top: 2px solid #333; height: 90px;
-        }
+        .nav-bar { background: var(--surface); padding: 5px 0 20px; border-top: 1px solid #333; height: 65px; flex-shrink: 0; display: flex; z-index: 50; }
         .nav-item { flex: 1; text-align: center; color: var(--text-dim); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .nav-item span { font-size: 24px; margin-bottom: 5px; }
-        .nav-item div { font-size: 12px; font-weight: 800; text-transform: uppercase; }
+        .nav-item span { font-size: 20px; margin-bottom: 2px; }
+        .nav-item div { font-size: 9px; font-weight: 800; text-transform: uppercase; }
         .nav-item.active { color: var(--primary); transform: scale(1.1); transition: transform 0.2s; }
-
-        /* --- OVERLAYS --- */
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; }
-        .btn-main { padding: 15px 40px; border-radius: 12px; border: none; background: var(--primary); font-weight: 900; font-size: 18px; color: #000; cursor: pointer; margin-top: 20px; }
-        
-        .floating-gift { animation: float 1s infinite alternate ease-in-out; }
-        @keyframes float { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+
+        /* Стиль для блока обмена */
+        .exchange-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin: 10px 0; font-weight: bold; font-size: 18px; }
     </style>
 </head>
-<body id="game-body">
+<body>
     <div id="main-wrapper">
         <div class="header">
             <div class="header-left">
                 <span>🐍 <span id="score">0</span></span>
                 <span class="mute-btn" onclick="toggleMute()" id="muteIcon">🔇</span>
             </div>
-            <div>
-                <div style="text-align: right;">
-                    <span style="font-size: 11px; opacity: 0.7;">БАЛАНС</span><br>
-                    <span style="color: var(--primary); font-weight: 900; font-size: 16px;"><span id="balance">0</span> HT</span>
-                </div>
+            <div style="text-align: right;">
+                <span style="font-size: 9px; opacity: 0.7;">БАЛАНС</span><br>
+                <span style="color: var(--primary); font-weight: 900; font-size: 14px;"><span id="balance">0</span> HT</span>
             </div>
         </div>
 
-        <div id="game-section" class="page-section" style="display: flex;">
-            <div class="shop-desc" style="text-align: center; width: 90%;">
-                Собери 40 очков для следующего уровня!
-            </div>
+        <div class="content-area">
             
-            <button id="startBtn" class="btn-main" onclick="startGame()">ИГРАТЬ</button>
-            
-            <div class="canvas-wrapper">
-                <canvas id="gameCanvas" width="320" height="320"></canvas>
-            </div>
-
-            <div class="controls">
-                <div class="ctrl-btn" style="grid-column:2" onpointerdown="setDirection('UP')">▲</div>
-                <div class="ctrl-btn" style="grid-column:1; grid-row:2" onpointerdown="setDirection('LEFT')">◀</div>
-                <div class="ctrl-btn" style="grid-column:3; grid-row:2" onpointerdown="setDirection('RIGHT')">▶</div>
-                <div class="ctrl-btn" style="grid-column:2; grid-row:3" onpointerdown="setDirection('DOWN')">▼</div>
-            </div>
-        </div>
-
-        <div id="wheel-section" class="page-section">
-            <div class="wheel-container">
-                <h2 style="color: var(--primary); margin: 0; font-size: 28px; text-transform: uppercase;">Колесо Удачи</h2>
-                <div class="wheel-outer">
-                    <div class="wheel-pointer"></div>
-                    <div id="wheel">
-                        <div class="wheel-label l1">1 HT</div>
-                        <div class="wheel-label l2">0 HT</div>
-                        <div class="wheel-label l3">ЕЩЁ!</div>
-                        <div class="wheel-label l4">1 ⭐</div>
-                        <div class="wheel-label l5">5 HT</div>
-                        <div class="wheel-label l6">10 HT</div>
-                        <div class="wheel-label l7">25 HT</div>
-                        <div class="wheel-label l8">VIP 1Д</div>
+            <div id="game-section" class="page-section" style="display: flex;">
+                <div class="game-info">Собери 40 очков для бонуса!</div>
+                <div class="canvas-container">
+                    <div class="canvas-wrapper" id="canvasWrapper">
+                        <canvas id="gameCanvas"></canvas>
+                        <div id="startOverlay" class="start-overlay">
+                            <button id="startBtn" class="btn-main" onclick="startGame()">ИГРАТЬ</button>
+                        </div>
                     </div>
                 </div>
-                <button id="spinBtn" class="spin-btn" onclick="spinWheel()">КРУТИТЬ</button>
-                <p id="wheel-msg" style="color: var(--primary); font-weight: bold; min-height: 24px; text-align: center; font-size: 18px;"></p>
-            </div>
-        </div>
-
-        <div id="shop-section" class="page-section">
-            <h2 style="text-align: center; color: var(--primary);">💎 VIP МАГАЗИН</h2>
-            
-            <div class="card" style="border: 2px solid var(--primary); background: rgba(241, 196, 15, 0.05);">
-                <h3 style="margin-top: 0; color: var(--success);">ПРЕИМУЩЕСТВА VIP:</h3>
-                <ul style="padding-left: 20px; line-height: 1.6; font-size: 14px; color: #ddd;">
-                    <li><b>2x Бонусы</b> в игре (сбор очков)</li>
-                    <li><b>2x Умножение</b> выигрыша в Колесе</li>
-                    <li><b>2x Награда</b> в Ежедневном боксе</li>
-                    <li>💰 Вывод средств от <b>2500 HT</b></li>
-                </ul>
-            </div>
-
-            <div class="card">
-                <div class="shop-item">
-                    <div><b>5 ДНЕЙ VIP</b><br><small>Пробный период</small></div>
-                    <button class="buy-btn" onclick="buyVip(5, 20)">20 ⭐</button>
-                </div>
-                <div class="shop-item">
-                    <div style="color: var(--primary);"><b>15 ДНЕЙ VIP</b><br><small>Выгодный старт</small></div>
-                    <button class="buy-btn" onclick="buyVip(15, 150)">150 ⭐</button>
-                </div>
-                <div class="shop-item">
-                    <div style="color: #e74c3c;"><b>30 ДНЕЙ VIP</b><br><small>Максимальный профит</small></div>
-                    <button class="buy-btn" onclick="buyVip(30, 500)">500 ⭐</button>
+                <div class="controls-area">
+                    <div class="controls">
+                        <div class="ctrl-btn" style="grid-column:2" onpointerdown="handleControl(event, 'UP')">▲</div>
+                        <div class="ctrl-btn" style="grid-column:1; grid-row:2" onpointerdown="handleControl(event, 'LEFT')">◀</div>
+                        <div class="ctrl-btn" style="grid-column:3; grid-row:2" onpointerdown="handleControl(event, 'RIGHT')">▶</div>
+                        <div class="ctrl-btn" style="grid-column:2; grid-row:2" onpointerdown="handleControl(event, 'DOWN')">▼</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="bonus-section" class="page-section">
-            <div class="card" style="text-align: center; margin-top: 50px;">
-                <h2>Ежедневный бокс</h2>
-                <div class="floating-gift" style="font-size: 80px; margin: 20px;">🎁</div>
-                <button id="claimBtn" class="btn-main" style="width:100%;" onclick="claimDailyBonus()">ОТКРЫТЬ</button>
-                <p id="bonus-msg" style="margin-top: 15px; font-weight: bold;"></p>
+            <div id="wheel-section" class="page-section scrollable-content">
+                <div class="wheel-container">
+                    <h2 style="color: var(--primary); margin: 0;">Колесо Удачи</h2>
+                    <div class="wheel-outer">
+                        <div class="wheel-pointer"></div>
+                        <div id="wheel">
+                            <div class="wheel-label l1">1 HT</div>
+                            <div class="wheel-label l2">0 HT</div>
+                            <div class="wheel-label l3">ЕЩЁ!</div>
+                            <div class="wheel-label l4">1 ⭐</div>
+                            <div class="wheel-label l5">5 HT</div>
+                            <div class="wheel-label l6">10 HT</div>
+                            <div class="wheel-label l7">25 HT</div>
+                            <div class="wheel-label l8">VIP 1Д</div>
+                        </div>
+                    </div>
+                    <button id="spinBtn" class="btn-main" style="width: 150px;" onclick="spinWheel()">КРУТИТЬ</button>
+                    <p id="wheel-msg" style="color: var(--primary); font-weight: bold; min-height: 20px; text-align: center;"></p>
+                </div>
             </div>
-        </div>
 
-        <div id="profile-section" class="page-section">
-            <h2 style="text-align: center;">ПРОФИЛЬ</h2>
-            <div class="card" style="text-align: center;">
-                <p>Ваш баланс:</p>
-                <h1 style="color: var(--primary); font-size: 40px; margin: 10px 0;"><span id="profile-balance">0</span> HT</h1>
-                <p id="vip-status-profile" style="font-weight: bold; font-size: 18px;"></p>
-                <div style="font-size: 13px; color: #888;" id="vip-timer"></div>
+            <div id="shop-section" class="page-section scrollable-content">
+                <h2 style="text-align: center; color: var(--primary); margin-top:0;">💎 VIP МАГАЗИН</h2>
+                <div class="card" style="border: 1px solid var(--primary); background: rgba(241, 196, 15, 0.05);">
+                    <ul style="padding-left: 20px; margin:0; font-size: 13px; color: #ddd;">
+                        <li><b>2x Бонусы</b> в игре</li>
+                        <li><b>2x Выигрыш</b> в Колесе</li>
+                        <li>💰 Лимит вывода <b>2500 HT</b></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="shop-item">
+                        <div><b>5 ДНЕЙ</b></div>
+                        <button class="btn-buy" onclick="buyVip(5, 20)">20 ⭐</button>
+                    </div>
+                    <div class="shop-item">
+                        <div style="color: var(--primary);"><b>15 ДНЕЙ</b></div>
+                        <button class="btn-buy" onclick="buyVip(15, 150)">150 ⭐</button>
+                    </div>
+                    <div class="shop-item">
+                        <div style="color: #e74c3c;"><b>30 ДНЕЙ</b></div>
+                        <button class="btn-buy" onclick="buyVip(30, 500)">500 ⭐</button>
+                    </div>
+                </div>
             </div>
-            <div class="card" style="border-left: 4px solid var(--accent);">
-                <h3>💳 Вывод средств</h3>
-                <p style="font-size: 14px;">Лимит для вывода: <span id="withdraw-limit">5000</span> HT</p>
-                <button class="btn-main" style="width: 100%; background: #333; color: #777; font-size: 14px;" onclick="alert('Недостаточно средств!')">ВЫВЕСТИ</button>
+
+            <div id="bonus-section" class="page-section scrollable-content">
+                <div class="card" style="text-align: center; margin-top: 20px;">
+                    <h2>Ежедневный бокс</h2>
+                    <div style="font-size: 80px; margin: 20px;">🎁</div>
+                    <button id="claimBtn" class="btn-main" style="width:100%;" onclick="claimDailyBonus()">ОТКРЫТЬ</button>
+                    <p id="bonus-msg" style="margin-top: 15px; font-size: 14px; color: #888;"></p>
+                </div>
             </div>
+
+            <div id="profile-section" class="page-section scrollable-content">
+                <div class="card" style="text-align: center;">
+                    <p style="margin:0; font-size: 14px;">Ваш баланс:</p>
+                    <h1 style="color: var(--primary); font-size: 32px; margin: 5px 0;"><span id="profile-balance">0</span> HT</h1>
+                    <p id="vip-status-profile" style="font-size: 14px; margin: 5px 0;"></p>
+                </div>
+
+                <div class="card" style="border: 2px solid var(--success);">
+                    <h3 style="margin: 0; color: var(--success);">💸 Вывод средств</h3>
+                    <p style="font-size: 12px; color: #aaa; margin-bottom: 5px;">Обменный курс:</p>
+                    
+                    <div class="exchange-row">
+                        <span style="color: var(--primary);"><span id="withdraw-limit-text">5000</span> HT</span>
+                        <span>➡️</span>
+                        <span style="color: var(--success);">1 $</span>
+                    </div>
+
+                    <p id="withdraw-status" style="font-size: 12px; text-align: center; margin: 5px 0;">Загрузка...</p>
+                    <button id="withdrawBtn" class="btn-withdraw" onclick="withdrawMoney()" disabled>ОБМЕНЯТЬ И ВЫВЕСТИ</button>
+                </div>
+
+                <div class="card" style="border-left: 4px solid #2481cc;">
+                    <h3>🤝 Рефералка</h3>
+                    <p style="font-size: 13px;">За друга: <span style="color: var(--primary);">+15 HT</span></p>
+                    <button class="btn-main" style="width:100%; background:#2481cc; color:#fff;" onclick="shareGame()">ПРИГЛАСИТЬ</button>
+                </div>
+            </div>
+
         </div>
 
         <div class="nav-bar">
@@ -238,186 +224,109 @@
     </div>
 
     <script>
-        // --- AUDIO ENGINE (MIDI STYLE) ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let isMuted = true; // По умолчанию выкл, чтобы не пугать
-        let noteTimeout;
+        let isMuted = true;
         
-        // Простая мелодия
-        const melody = [
-            {f: 330, d: 200}, {f: 330, d: 200}, {f: 349, d: 200}, {f: 392, d: 400},
-            {f: 392, d: 200}, {f: 349, d: 200}, {f: 330, d: 200}, {f: 294, d: 200},
-            {f: 262, d: 200}, {f: 262, d: 200}, {f: 294, d: 200}, {f: 330, d: 300},
-            {f: 294, d: 100}, {f: 294, d: 400}
-        ];
-        let noteIndex = 0;
-
         function toggleMute() {
             isMuted = !isMuted;
             document.getElementById('muteIcon').innerText = isMuted ? '🔇' : '🔊';
             if(!isMuted && audioCtx.state === 'suspended') audioCtx.resume();
-            if(!isMuted && isRunning) playMusic();
-            else clearTimeout(noteTimeout);
         }
-
-        function playTone(freq, duration, type='square') {
+        function playTone(f,d,t='square'){
             if(isMuted) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration/1000);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration/1000);
+            const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+            o.type=t; o.frequency.value=f;
+            g.gain.setValueAtTime(0.1,audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+d/1000);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime+d/1000);
         }
 
-        function playMusic() {
-            if(isMuted || !isRunning) return;
-            const note = melody[noteIndex % melody.length];
-            playTone(note.f, note.d);
-            noteIndex++;
-            noteTimeout = setTimeout(playMusic, note.d);
-        }
-
-        // --- GAME LOGIC ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const box = 20; // Размер клетки
-        const rows = canvas.height / box;
-        const cols = canvas.width / box;
-
-        let snake = [], food = {}, gift = { active: false, x: 0, y: 0, timer: 0, nextSpawn: 0 };
-        let d, gameLoop, points = parseInt(localStorage.getItem('ht_balance')) || 0;
-        let isRunning = false;
-        
-        // VIP Logic
+        let box = 20; let rows, cols;
+        let snake=[], food={}, d, isRunning=false;
+        let points = parseInt(localStorage.getItem('ht_balance')) || 0;
         let vipExpiry = parseInt(localStorage.getItem('vipExpiry')) || 0;
         let isVip = false;
 
-        function initGame() {
-            snake = [{x: 5*box, y: 10*box}, {x: 4*box, y: 10*box}, {x: 3*box, y: 10*box}];
-            food = spawnItem();
-            d = "RIGHT"; 
-            
-            // Gift logic reset
-            gift.active = false;
-            gift.nextSpawn = Date.now() + 15000; // Появится через 15 сек
+        function resizeGame() {
+            const container = document.querySelector('.canvas-container');
+            const maxWidth = container.clientWidth - 20; 
+            const maxHeight = container.clientHeight - 20;
+            const size = Math.min(maxWidth, maxHeight);
+            const gridSize = 20; 
+            box = Math.floor(size / gridSize); 
+            const finalSize = box * gridSize;
+            canvas.width = finalSize; canvas.height = finalSize;
+            const wrapper = document.getElementById('canvasWrapper');
+            wrapper.style.width = finalSize + 'px'; wrapper.style.height = finalSize + 'px';
+            rows = canvas.height / box; cols = canvas.width / box;
+            if(!isRunning && snake.length > 0) draw();
+        }
 
-            checkVip(); updateUI();
-            noteIndex = 0;
+        window.addEventListener('resize', resizeGame);
+
+        function initGame() {
+            resizeGame();
+            snake = [{x: 5*box, y: 10*box}, {x: 4*box, y: 10*box}, {x: 3*box, y: 10*box}];
+            food = spawnItem(); d = "RIGHT"; 
+            checkVip(); updateUI(); draw();
         }
 
         function spawnItem() {
-            return {
-                x: Math.floor(Math.random() * cols) * box,
-                y: Math.floor(Math.random() * rows) * box
-            };
+            return { x: Math.floor(Math.random() * cols) * box, y: Math.floor(Math.random() * rows) * box };
         }
 
         function startGame() {
-            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('startOverlay').style.display = 'none';
             isRunning = true;
-            if(!isMuted) {
-                if(audioCtx.state === 'suspended') audioCtx.resume();
-                playMusic();
-            }
-            initGame();
-            run();
+            if(!isMuted && audioCtx.state === 'suspended') audioCtx.resume();
+            initGame(); run();
         }
 
         function run() {
             if(!isRunning) return;
-
-            // Logic Gift
-            const now = Date.now();
-            if (!gift.active && now > gift.nextSpawn) {
-                // Появление подарка
-                gift.x = Math.floor(Math.random() * cols) * box;
-                gift.y = Math.floor(Math.random() * rows) * box;
-                gift.active = true;
-                gift.timer = now + 7000; // Исчезнет через 7 сек
-                playTone(600, 300, 'sine'); // Звук появления
-            }
-            if (gift.active && now > gift.timer) {
-                // Исчезновение
-                gift.active = false;
-                gift.nextSpawn = now + 15000;
-            }
-
-            // Move Snake
             let hx = snake[0].x, hy = snake[0].y;
             if(d=="LEFT") hx -= box; if(d=="UP") hy -= box;
             if(d=="RIGHT") hx += box; if(d=="DOWN") hy += box;
 
-            // Collision Check
             if(hx < 0 || hx >= canvas.width || hy < 0 || hy >= canvas.height || snake.some(s => s.x === hx && s.y === hy)) {
                 endGame(); return;
             }
 
-            // Eat Food (Apple)
             if(hx === food.x && hy === food.y) {
                 points += isVip ? 2 : 1; 
-                playTone(800, 100, 'triangle');
+                playTone(600, 100);
                 food = spawnItem();
-            } else {
-                snake.pop(); // Remove tail
-            }
+            } else { snake.pop(); }
 
-            // Eat Gift
-            if(gift.active && hx === gift.x && hy === gift.y) {
-                points += isVip ? 10 : 5; // Бонус за подарок
-                playTone(1000, 400, 'square'); // Звук бонуса
-                gift.active = false;
-                gift.nextSpawn = now + 15000;
-            }
-
-            snake.unshift({x: hx, y: hy}); // Add Head
-
-            draw();
-            updateUI();
-            setTimeout(run, 150); // Скорость игры
+            snake.unshift({x: hx, y: hy});
+            draw(); updateUI(); setTimeout(run, 150);
         }
 
         function draw() {
-            // Background
             ctx.fillStyle = "#111"; ctx.fillRect(0,0,canvas.width,canvas.height);
-            
-            // Grid (optional, for style)
             ctx.strokeStyle = "#222"; ctx.lineWidth = 1;
             for(let i=0; i<cols; i++) { ctx.beginPath(); ctx.moveTo(i*box,0); ctx.lineTo(i*box,canvas.height); ctx.stroke(); }
             for(let i=0; i<rows; i++) { ctx.beginPath(); ctx.moveTo(0,i*box); ctx.lineTo(canvas.width,i*box); ctx.stroke(); }
-
-            // Draw Snake
             for(let i=0; i<snake.length; i++) {
                 if(i == 0) {
-                    // Head 🐍
-                    ctx.font = "20px Arial";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
+                    ctx.font = (box) + "px Arial";
+                    ctx.textAlign = "center"; ctx.textBaseline = "middle";
                     ctx.fillText("🐍", snake[i].x + box/2, snake[i].y + box/2 + 2);
                 } else {
-                    // Body
                     ctx.fillStyle = "#2ecc71";
-                    ctx.beginPath();
-                    ctx.arc(snake[i].x + box/2, snake[i].y + box/2, box/2 - 2, 0, Math.PI*2);
-                    ctx.fill();
+                    ctx.beginPath(); ctx.arc(snake[i].x + box/2, snake[i].y + box/2, box/2 - 2, 0, Math.PI*2); ctx.fill();
                 }
             }
-
-            // Draw Food 🍎
-            ctx.font = "20px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
+            ctx.font = (box) + "px Arial";
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
             ctx.fillText("🍎", food.x + box/2, food.y + box/2 + 2);
-
-            // Draw Gift 🎁
-            if(gift.active) {
-                ctx.fillText("🎁", gift.x + box/2, gift.y + box/2 + 2);
-            }
         }
 
-        function setDirection(dir) {
+        function handleControl(e, dir) {
+            e.preventDefault();
             if(dir=="UP" && d!="DOWN") d="UP";
             if(dir=="DOWN" && d!="UP") d="DOWN";
             if(dir=="LEFT" && d!="RIGHT") d="LEFT";
@@ -426,159 +335,163 @@
 
         function endGame() {
             isRunning = false;
-            clearTimeout(noteTimeout);
             playTone(150, 500, 'sawtooth');
-            document.getElementById('end-score').innerText = "Твой счет: " + (snake.length-3);
+            document.getElementById('end-score').innerText = "Счет: " + (snake.length-3);
             document.getElementById('modal').style.display = 'flex';
         }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; document.getElementById('startBtn').style.display = 'block'; }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; document.getElementById('startOverlay').style.display = 'flex'; }
 
-        // --- WHEEL LOGIC (FIXED ROTATION) ---
+        // --- WHEEL LOGIC ---
         let currentRotation = 0;
-        let canSpin = true;
+        let isSpinning = false;
+        const COOLDOWN_TIME = 4 * 60 * 60 * 1000; 
 
-        function spinWheel() {
-            if(!canSpin) return;
-
-            // Cooldown check (4 hours)
+        function updateWheelTimer() {
             const lastSpin = parseInt(localStorage.getItem('lastSpinTime')) || 0;
-            if(Date.now() - lastSpin < 14400000) {
-                alert("Колесо отдыхает! Приходи через 4 часа.");
-                return;
+            const now = Date.now();
+            const diff = now - lastSpin;
+            const btn = document.getElementById('spinBtn');
+            const msg = document.getElementById('wheel-msg');
+
+            if (diff < COOLDOWN_TIME) {
+                const remaining = COOLDOWN_TIME - diff;
+                const hours = Math.floor(remaining / (1000 * 60 * 60));
+                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                btn.disabled = true;
+                btn.innerText = `${hours}ч ${minutes}м`;
+                msg.innerText = "Ожидайте перезарядки...";
+            } else {
+                btn.disabled = false;
+                btn.innerText = "КРУТИТЬ";
+                msg.innerText = "Колесо готово!";
             }
-
-            canSpin = false;
-            document.getElementById('spinBtn').disabled = true;
-            document.getElementById('wheel-msg').innerText = "Крутим...";
-            playTone(400, 200);
-
-            // 8 Sectors
-            const sectors = [
-                { val: 1, type: 'ht' }, { val: 0, type: 'zero' },
-                { val: 0, type: 'again' }, { val: 0, type: 'star' },
-                { val: 5, type: 'ht' }, { val: 10, type: 'ht' },
-                { val: 25, type: 'ht' }, { val: 1, type: 'vip' }
-            ];
-            
-            // Random Logic
-            const winIndex = Math.floor(Math.random() * 8);
-            const win = sectors[winIndex];
-
-            // Calculate rotation: 
-            // 8 sectors = 45deg each.
-            // Index 0 is at 0-45deg. To point to it at the top, we rotate the wheel so that sector is at the top pointer.
-            // However, CSS conic gradient starts at 0 (top/12 o'clock).
-            // A simple way is to just rotate random degrees + lots of spins.
-            
-            const spinRounds = 360 * 5; // 5 full spins
-            const sectorAngle = 45;
-            // Target angle to land the specific sector under the pointer (pointer is at top)
-            // Need to invert the index because wheel spins clockwise
-            const targetAngle = (360 - (winIndex * sectorAngle)) - (sectorAngle / 2); 
-            
-            // Add to current rotation so it doesn't reset
-            currentRotation += spinRounds + targetAngle;
-            
-            // Fix alignment issue by adding random deviation inside sector
-            const randomOffset = Math.floor(Math.random() * 20) - 10;
-            
-            document.getElementById('wheel').style.transform = `rotate(${currentRotation + randomOffset}deg)`;
-
-            setTimeout(() => {
-                let msg = "";
-                if(win.type === 'ht') {
-                    let amt = isVip ? win.val * 2 : win.val;
-                    points += amt;
-                    msg = `+${amt} HT`;
-                    localStorage.setItem('lastSpinTime', Date.now());
-                } else if(win.type === 'vip') {
-                    activateVip(1);
-                    msg = "VIP на 1 день!";
-                    localStorage.setItem('lastSpinTime', Date.now());
-                } else if(win.type === 'again') {
-                    msg = "Крути еще раз!";
-                    // No timer set
-                } else if(win.type === 'zero') {
-                    msg = "Пусто :(";
-                    localStorage.setItem('lastSpinTime', Date.now());
-                } else {
-                    msg = "Звезда Telegram!";
-                    localStorage.setItem('lastSpinTime', Date.now());
-                }
-
-                document.getElementById('wheel-msg').innerText = msg;
-                playTone(600, 500, 'square'); // Win sound
-                canSpin = true;
-                document.getElementById('spinBtn').disabled = false;
-                updateUI();
-            }, 5000); // Matches CSS transition time
         }
 
-        // --- GENERAL UI & VIP ---
+        function spinWheel() {
+            if(isSpinning) return;
+            const lastSpin = parseInt(localStorage.getItem('lastSpinTime')) || 0;
+            if(Date.now() - lastSpin < COOLDOWN_TIME) { return; }
+
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+            
+            const winVal = [1, 0, 0, 0, 5, 10, 25, 1][Math.floor(Math.random()*8)];
+            const spins = 5 * 360; 
+            const deg = Math.floor(Math.random() * 360);
+            
+            currentRotation += spins + deg;
+            document.getElementById('wheel').style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                localStorage.setItem('lastSpinTime', Date.now());
+                if(winVal > 0) {
+                    points += isVip ? winVal * 2 : winVal;
+                    document.getElementById('wheel-msg').innerText = `Выпало: ${winVal} HT!`;
+                } else {
+                    document.getElementById('wheel-msg').innerText = "Пусто или Звезда!";
+                }
+                updateUI();
+                updateWheelTimer();
+            }, 5000);
+        }
+
+        // --- DAILY BONUS ---
+        function checkDailyBonus() {
+            const lastBonusDate = localStorage.getItem('lastBonusDate');
+            const today = new Date().toDateString();
+            const btn = document.getElementById('claimBtn');
+            const msg = document.getElementById('bonus-msg');
+            if (lastBonusDate === today) {
+                btn.disabled = true; btn.style.opacity = "0.5"; btn.innerText = "ЗАБРАНО"; msg.innerText = "Приходи завтра за наградой!";
+            } else {
+                btn.disabled = false; btn.style.opacity = "1"; btn.innerText = "ОТКРЫТЬ"; msg.innerText = "Бонус доступен!";
+            }
+        }
+        function claimDailyBonus() {
+            const today = new Date().toDateString();
+            if(localStorage.getItem('lastBonusDate') === today) return;
+            points += isVip ? 50 : 25;
+            localStorage.setItem('lastBonusDate', today);
+            updateUI(); checkDailyBonus(); alert("Бонус получен!");
+        }
+
+        // --- GENERAL & WITHDRAWAL ---
         function checkVip() {
             if(Date.now() < vipExpiry) {
                 isVip = true;
-                const days = Math.ceil((vipExpiry - Date.now()) / (1000 * 60 * 60 * 24));
-                document.getElementById('vip-status-profile').innerHTML = `<span style="color:#2ecc71">✨ VIP АКТИВЕН (${days} дн.)</span>`;
-                document.getElementById('withdraw-limit').innerText = "2500";
-                document.body.style.background = "#1a0b1f"; // Purple tint bg
+                const days = Math.ceil((vipExpiry - Date.now()) / (86400000));
+                document.getElementById('vip-status-profile').innerHTML = `<span style="color:#2ecc71">✨ VIP (${days} дн.)</span>`;
             } else {
                 isVip = false;
                 document.getElementById('vip-status-profile').innerText = "Обычный аккаунт";
-                document.getElementById('withdraw-limit').innerText = "5000";
-                document.body.style.background = "#0b0e11";
             }
         }
+        function buyVip(d, c) { 
+            if(confirm(`Купить VIP на ${d} дн?`)) {
+                vipExpiry = Date.now() + d*86400000; 
+                localStorage.setItem('vipExpiry', vipExpiry); 
+                checkVip(); updateUI(); // Обновит и лимит вывода
+            }
+        }
+        
+        // ЛОГИКА ВЫВОДА СРЕДСТВ
+        function updateWithdrawUI() {
+            const limit = isVip ? 2500 : 5000;
+            const limitText = document.getElementById('withdraw-limit-text');
+            const status = document.getElementById('withdraw-status');
+            const btn = document.getElementById('withdrawBtn');
 
-        function activateVip(days) {
-            const ms = days * 24 * 60 * 60 * 1000;
-            // If already VIP, add time, else set new
-            if (Date.now() < vipExpiry) {
-                vipExpiry += ms;
+            limitText.innerText = limit;
+
+            if(points >= limit) {
+                btn.disabled = false;
+                status.innerHTML = "<span style='color:#2ecc71'>Доступно для вывода!</span>";
             } else {
-                vipExpiry = Date.now() + ms;
-            }
-            localStorage.setItem('vipExpiry', vipExpiry);
-            checkVip();
-            updateUI();
-        }
-
-        function buyVip(days, cost) {
-            if(confirm(`Купить VIP на ${days} дней за ${cost} звезд?`)) {
-                // Here you would integrate Telegram Stars payment
-                alert("Симуляция: Оплата прошла успешно!");
-                activateVip(days);
+                btn.disabled = true;
+                const needed = limit - points;
+                status.innerHTML = `<span style='color:#e74c3c'>Не хватает ${needed} HT</span>`;
             }
         }
 
-        function claimDailyBonus() {
-            const today = new Date().toDateString();
-            if(localStorage.getItem('lastBonus') === today) {
-                document.getElementById('bonus-msg').innerText = "Заходи завтра!";
-                return;
+        function withdrawMoney() {
+            const limit = isVip ? 2500 : 5000;
+            if(points >= limit) {
+                if(confirm(`Обменять ${limit} HT на 1$?`)) {
+                    points -= limit;
+                    alert("✅ Заявка создана! Вы успешно обменяли средства. Деньги поступят в течение 24 часов.");
+                    updateUI();
+                }
+            } else {
+                alert("Недостаточно средств!");
             }
-            let amt = isVip ? 50 : 25;
-            points += amt;
-            localStorage.setItem('lastBonus', today);
-            document.getElementById('bonus-msg').innerText = `Получено +${amt} HT!`;
-            updateUI();
         }
+
+        function shareGame() { alert("Ссылка скопирована!"); }
 
         function updateUI() {
             localStorage.setItem('ht_balance', points);
             document.getElementById('balance').innerText = points;
             document.getElementById('profile-balance').innerText = points;
-            document.getElementById('score').innerText = snake ? snake.length-3 : 0;
+            document.getElementById('score').innerText = snake.length > 3 ? snake.length-3 : 0;
+            updateWithdrawUI(); // Обновляем кнопку вывода
         }
 
         function showTab(t) {
             document.querySelectorAll('.page-section').forEach(e => e.style.display='none');
-            document.getElementById(t+'-section').style.display = t==='game'?'flex':'flex';
+            const section = document.getElementById(t+'-section');
+            section.style.display = (t === 'game') ? 'flex' : 'block';
             document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
             document.getElementById('nav-'+t).classList.add('active');
+            
+            if(t === 'wheel') updateWheelTimer();
+            if(t === 'bonus') checkDailyBonus();
+            if(t === 'game') resizeGame();
+            if(t === 'profile') updateWithdrawUI(); // Проверяем баланс при входе в профиль
         }
 
-        // Init
+        setInterval(updateWheelTimer, 60000);
+
         window.onload = () => { initGame(); showTab('game'); };
     </script>
 </body>
