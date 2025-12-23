@@ -467,7 +467,26 @@
             }
         }
 
-        function shareGame() { alert("Ссылка скопирована!"); }
+        // === ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРИГЛАШЕНИЯ ===
+        function shareGame() {
+            // ЗАМЕНИТЕ НА СВОЕ ИМЯ БОТА (без @)
+            // Например: const botLink = "https://t.me/SnakeGameBot";
+            const botLink = "https://t.me/YOUR_BOT_USERNAME"; 
+            
+            const shareText = "Играй со мной в Haytocen Snake VIP и получай токены!";
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${encodeURIComponent(shareText)}`;
+
+            // Начисляем 15 HT сразу (имитация рефералки)
+            points += 15;
+            updateUI(); // Обновляем баланс на экране
+            
+            // Открываем нативное окно выбора друзей в Telegram
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.openTelegramLink(shareUrl);
+            } else {
+                window.open(shareUrl, '_blank');
+            }
+        }
 
         function updateUI() {
             localStorage.setItem('ht_balance', points);
@@ -492,7 +511,15 @@
 
         setInterval(updateWheelTimer, 60000);
 
-        window.onload = () => { initGame(); showTab('game'); };
+        window.onload = () => { 
+            // Инициализация
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand(); // Разворачиваем на весь экран
+            }
+            initGame(); 
+            showTab('game'); 
+        };
     </script>
 </body>
 </html>
