@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="hy">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -132,7 +132,7 @@
 
             <div id="shop-section" class="page-section scrollable-content">
                 <h2 style="text-align: center; color: var(--primary); margin-top:0;">💎 VIP ԽԱՆՈՒԹ</h2>
-                <div class="card" style="border: 1px solid var(--primary); background: rgba(241, 196, 15, 0.05);">
+                <div class="card">
                     <ul style="padding-left: 20px; margin:0; font-size: 13px; color: #ddd;">
                         <li><b>2x Բոնուս</b> խաղում</li>
                         <li><b>2x Հաղթանակ</b> Անիվում</li>
@@ -195,23 +195,6 @@
     </div>
 
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let isMuted = true;
-        function toggleMute() {
-            isMuted = !isMuted;
-            document.getElementById('muteIcon').innerText = isMuted ? '🔇' : '🔊';
-            if(!isMuted && audioCtx.state === 'suspended') audioCtx.resume();
-        }
-        function playTone(f,d,t='square'){
-            if(isMuted) return;
-            const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-            o.type=t; o.frequency.value=f;
-            g.gain.setValueAtTime(0.1,audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+d/1000);
-            o.connect(g); g.connect(audioCtx.destination);
-            o.start(); o.stop(audioCtx.currentTime+d/1000);
-        }
-
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let box = 20, rows, cols, snake=[], food={}, d, isRunning=false;
@@ -243,7 +226,7 @@
             if(d=="LEFT") hx -= box; if(d=="UP") hy -= box;
             if(d=="RIGHT") hx += box; if(d=="DOWN") hy += box;
             if(hx < 0 || hx >= canvas.width || hy < 0 || hy >= canvas.height || snake.some(s => s.x === hx && s.y === hy)) { endGame(); return; }
-            if(hx === food.x && hy === food.y) { points += isVip ? 2 : 1; playTone(600, 100); food = spawnItem(); } else { snake.pop(); }
+            if(hx === food.x && hy === food.y) { points += isVip ? 2 : 1; food = spawnItem(); } else { snake.pop(); }
             snake.unshift({x: hx, y: hy}); draw(); updateUI(); setTimeout(run, 150);
         }
 
@@ -292,7 +275,7 @@
 
         function checkVip() {
             isVip = Date.now() < vipExpiry;
-            document.getElementById('vip-status-profile').innerText = isVip ? "✨ VIP Active" : "Regular Account";
+            document.getElementById('vip-status-profile').innerText = isVip ? "✨ VIP Ակտիվ է" : "Սովորական հաշիվ";
         }
 
         function buyVip(d, c) { 
@@ -301,13 +284,22 @@
             checkVip(); updateUI(); 
         }
 
-        // === ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРИГЛАШЕНИЯ ===
+        // === ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРИГЛАШЕНИЯ С ID ===
         function shareGame() {
-            const botLink = "https://t.me/MyCoinFMBot"; 
+            const botUsername = "MyCoinFMBot";
+            let userId = 0;
+            
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
+                userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+            }
+
+            const botLink = `https://t.me/${botUsername}?start=${userId}`; 
             const shareText = "Միացիր ինձ MyCoinFM-ում! 🐍 Խաղա և հավաքիր HT տոկեններ:";
             const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${encodeURIComponent(shareText)}`;
+
             points += 15;
             updateUI();
+
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.openTelegramLink(shareUrl);
             } else {
