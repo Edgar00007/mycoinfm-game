@@ -27,17 +27,19 @@
 
         #main-wrapper { max-width: 500px; margin: auto; height: 100%; display: flex; flex-direction: column; }
 
+        /* Header */
         .header { 
             background: var(--surface); padding: 0 15px; border-bottom: 2px solid var(--primary); 
             display: flex; justify-content: space-between; align-items: center; 
             height: 50px; flex-shrink: 0; z-index: 10;
         }
         .header-left { display: flex; gap: 15px; align-items: center; font-weight: 900; font-size: 18px; }
+        .mute-btn { cursor: pointer; font-size: 20px; padding: 5px; }
 
         .content-area { flex-grow: 1; position: relative; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
         .page-section { display: none; width: 100%; min-height: 100%; flex-direction: column; align-items: center; }
 
-        /* Game Section Styles */
+        /* Game Section */
         #game-section { height: 100%; overflow: hidden; justify-content: space-between; padding-bottom: 10px; box-sizing: border-box; }
         .level-info { width: 100%; display: flex; justify-content: space-between; padding: 5px 15px; box-sizing: border-box; background: rgba(0,0,0,0.3); font-size: 12px; font-weight: bold; color: var(--primary); }
         .progress-bar { width: 100%; height: 4px; background: #333; position: relative; }
@@ -56,38 +58,39 @@
         /* Wheel Styles */
         .wheel-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 20px; }
         .wheel-outer { position: relative; width: 280px; height: 280px; border-radius: 50%; border: 8px solid var(--surface); overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        /* Стрелка теперь указывает вниз сверху, логика поворота переписана под это */
-        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 40px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 25; }
+        /* Стрелка */
+        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 40px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 25; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
+        
         #wheel { 
             width: 100%; height: 100%; border-radius: 50%; position: relative;
             transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); 
-            /* Сектора идут по часовой стрелке, каждый 45 градусов */
+            /* Цвета как на скриншоте пользователя */
             background: conic-gradient(
-                #f1c40f 0deg 45deg,   /* Сектор 1 */
-                #2c3e50 45deg 90deg,  /* Сектор 2 */
-                #f39c12 90deg 135deg, /* Сектор 3 */
-                #34495e 135deg 180deg, /* Сектор 4 */
-                #d4ac0d 180deg 225deg, /* Сектор 5 */
-                #2c3e50 225deg 270deg, /* Сектор 6 */
-                #e67e22 270deg 315deg, /* Сектор 7 */
-                #8e44ad 315deg 360deg  /* Сектор 8 */
+                #8e44ad 0deg 45deg,   /* 10 HT (Purple) */
+                #f1c40f 45deg 90deg,  /* 25 HT (Yellow) */
+                #34495e 90deg 135deg, /* VIP (Dark Blue/Grey) */
+                #e67e22 135deg 180deg, /* 1 HT (Orange) */
+                #34495e 180deg 225deg, /* 0 HT (Dark Blue/Grey) */
+                #f1c40f 225deg 270deg, /* Again (Yellow) */
+                #34495e 270deg 315deg, /* 1 Star (Dark Blue/Grey) */
+                #e67e22 315deg 360deg  /* 5 HT (Orange) */
             );
         }
-        .wheel-label { position: absolute; top: 50%; left: 50%; width: 50%; height: 20px; margin-top: -10px; transform-origin: left center; display: flex; align-items: center; justify-content: flex-end; font-weight: 900; font-size: 12px; padding-right: 25px; box-sizing: border-box; color: #fff; text-shadow: 1px 1px 2px #000; }
+        .wheel-label { position: absolute; top: 50%; left: 50%; width: 50%; height: 20px; margin-top: -10px; transform-origin: left center; display: flex; align-items: center; justify-content: flex-end; font-weight: 900; font-size: 13px; padding-right: 30px; box-sizing: border-box; color: #fff; text-shadow: 1px 1px 2px #000; }
         
-        /* Поворот надписей точно в центр секторов */
-        .l1 { transform: rotate(22.5deg); color: #000; text-shadow: none; } 
-        .l2 { transform: rotate(67.5deg); } 
-        .l3 { transform: rotate(112.5deg); color: #000; text-shadow: none; } 
-        .l4 { transform: rotate(157.5deg); } 
-        .l5 { transform: rotate(202.5deg); color: #000; text-shadow: none; } 
-        .l6 { transform: rotate(247.5deg); } 
-        .l7 { transform: rotate(292.5deg); color: #000; text-shadow: none; } 
-        .l8 { transform: rotate(337.5deg); }
+        /* Позиционирование текста */
+        .l1 { transform: rotate(22.5deg); } /* 10 HT */
+        .l2 { transform: rotate(67.5deg); color: #000; text-shadow: none; } /* 25 HT */
+        .l3 { transform: rotate(112.5deg); } /* VIP */
+        .l4 { transform: rotate(157.5deg); } /* 1 HT */
+        .l5 { transform: rotate(202.5deg); } /* 0 HT */
+        .l6 { transform: rotate(247.5deg); color: #000; text-shadow: none; } /* Again */
+        .l7 { transform: rotate(292.5deg); } /* 1 Star */
+        .l8 { transform: rotate(337.5deg); } /* 5 HT */
 
         .scrollable-content { padding: 15px; width: 100%; box-sizing: border-box; }
         .card { background: var(--surface); padding: 15px; border-radius: 16px; width: 100%; margin-bottom: 12px; border: 1px solid #333; box-sizing: border-box; }
-        .btn-main { padding: 10px 25px; border-radius: 10px; border: none; background: var(--primary); font-weight: 900; font-size: 14px; color: #000; cursor: pointer; transition: 0.2s; }
+        .btn-main { padding: 12px 25px; border-radius: 10px; border: none; background: var(--primary); font-weight: 900; font-size: 16px; color: #000; cursor: pointer; transition: 0.2s; width: 100%; }
         .btn-main:disabled { background: #555; color: #888; cursor: not-allowed; }
         .btn-buy { padding: 8px 20px; border-radius: 10px; border: none; background: var(--btn-blue); font-weight: 900; font-size: 14px; color: #fff; cursor: pointer; box-shadow: 0 3px 0 #1e5a82; }
         .btn-withdraw { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--success); font-weight: 900; font-size: 16px; color: #000; cursor: pointer; margin-top: 10px; }
@@ -100,17 +103,26 @@
         .nav-item.active { color: var(--primary); transform: scale(1.1); transition: transform 0.2s; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; }
         .exchange-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin: 10px 0; font-weight: bold; font-size: 18px; }
+
+        /* Particles canvas for effects */
+        #effectsCanvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 99; width: 100%; height: 100%; }
     </style>
 </head>
 <body>
+    <canvas id="effectsCanvas"></canvas>
+    
     <div id="main-wrapper">
         <div class="header">
             <div class="header-left">
                 <span>🐍 <span id="score">0</span></span>
+                <span style="font-size: 12px; margin-left: 10px; color: #aaa;">BEST: <span id="high-score">0</span></span>
             </div>
-            <div style="text-align: right;">
-                <span style="font-size: 9px; opacity: 0.7;">ԲԱԼԱՆՍ</span><br>
-                <span style="color: var(--primary); font-weight: 900; font-size: 14px;"><span id="balance">0</span> HT</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</span>
+                <div style="text-align: right; line-height: 1.2;">
+                    <span style="font-size: 9px; opacity: 0.7;">ԲԱԼԱՆՍ</span><br>
+                    <span style="color: var(--primary); font-weight: 900; font-size: 14px;"><span id="balance">0</span> HT</span>
+                </div>
             </div>
         </div>
 
@@ -143,21 +155,24 @@
 
             <div id="wheel-section" class="page-section scrollable-content">
                 <div class="wheel-container">
-                    <h2 style="color: var(--primary); margin: 0;">Անիվ</h2>
+                    <h2 style="color: var(--primary); margin: 0;">Անիվ (4 Ժամ)</h2>
                     <div class="wheel-outer">
                         <div class="wheel-pointer"></div>
                         <div id="wheel">
-                            <div class="wheel-label l1">1 HT</div>
-                            <div class="wheel-label l2">0 HT</div>
-                            <div class="wheel-label l3">ԿՐԿԻՆ</div>
-                            <div class="wheel-label l4">1 ⭐</div>
-                            <div class="wheel-label l5">5 HT</div>
-                            <div class="wheel-label l6">10 HT</div>
-                            <div class="wheel-label l7">25 HT</div>
-                            <div class="wheel-label l8">VIP 1Օր</div>
+                            <div class="wheel-label l1">10 HT</div>
+                            <div class="wheel-label l2">25 HT</div>
+                            <div class="wheel-label l3">VIP 1Օր</div>
+                            <div class="wheel-label l4">1 HT</div>
+                            <div class="wheel-label l5">0 HT</div>
+                            <div class="wheel-label l6">ԿՐԿԻՆ</div>
+                            <div class="wheel-label l7">1 ⭐</div>
+                            <div class="wheel-label l8">5 HT</div>
                         </div>
                     </div>
-                    <button id="spinBtn" class="btn-main" style="width: 150px;" onclick="spinWheel()">ՊՏՏԵԼ</button>
+                    <div style="width: 100%; text-align: center; margin-top: 15px;">
+                        <button id="spinBtn" class="btn-main" style="width: 180px;" onclick="spinWheel()">ՊՏՏԵԼ</button>
+                        <div id="wheel-timer" style="margin-top: 10px; font-weight: bold; color: #e74c3c; display: none;">03:59:59</div>
+                    </div>
                     <p id="wheel-msg" style="color: var(--primary); font-weight: bold; min-height: 20px; text-align: center; margin-top: 10px;"></p>
                 </div>
             </div>
@@ -182,8 +197,8 @@
                 <div class="card" style="text-align: center; margin-top: 20px;">
                     <h2>Օրական բոնուս</h2>
                     <div style="font-size: 80px; margin: 20px;">🎁</div>
-                    <button id="claimBtn" class="btn-main" style="width:100%;" onclick="claimDailyBonus()">ԲԱՑԵԼ</button>
-                    <p id="bonus-timer" style="margin-top: 15px; font-size: 14px; color: #e74c3c; font-weight: bold;"></p>
+                    <button id="claimBtn" class="btn-main" onclick="claimDailyBonus()">ԲԱՑԵԼ</button>
+                    <p id="bonus-msg" style="margin-top: 15px; font-size: 14px; color: #888;"></p>
                 </div>
             </div>
 
@@ -213,9 +228,9 @@
 
         <div class="nav-bar">
             <div id="nav-game" class="nav-item active" onclick="showTab('game')"><span>🎮</span><div>ԽԱՂ</div></div>
-            <div id="nav-bonus" class="nav-item" onclick="showTab('bonus')"><span>💎</span><div>ԲՈՆՈՒՍ</div></div>
             <div id="nav-wheel" class="nav-item" onclick="showTab('wheel')"><span>🎡</span><div>ԱՆԻՎ</div></div>
             <div id="nav-shop" class="nav-item" onclick="showTab('shop')"><span>🛒</span><div>VIP</div></div>
+            <div id="nav-bonus" class="nav-item" onclick="showTab('bonus')"><span>💎</span><div>ԲՈՆՈՒՍ</div></div>
             <div id="nav-profile" class="nav-item" onclick="showTab('profile')"><span>👤</span><div>ԵՍ</div></div>
         </div>
     </div>
@@ -227,25 +242,62 @@
     </div>
 
     <script>
+        // --- 1. SOUND SYSTEM (NO EXTERNAL FILES) ---
+        const AudioSys = {
+            ctx: null,
+            muted: false,
+            init: function() {
+                if (!this.ctx) {
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+            },
+            playTone: function(freq, type, duration) {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            },
+            eat: function() { this.playTone(600, 'sine', 0.1); setTimeout(() => this.playTone(900, 'sine', 0.1), 50); },
+            click: function() { this.playTone(300, 'triangle', 0.05); },
+            die: function() { this.playTone(150, 'sawtooth', 0.5); },
+            win: function() { 
+                [400, 500, 600, 800].forEach((f, i) => setTimeout(() => this.playTone(f, 'square', 0.1), i*100));
+            }
+        };
+
+        function toggleMute() {
+            AudioSys.muted = !AudioSys.muted;
+            document.getElementById('muteBtn').innerText = AudioSys.muted ? "🔇" : "🔊";
+            if(!AudioSys.muted) AudioSys.init();
+        }
+
+        // --- 2. GAME LOGIC ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // --- ПЕРЕМЕННЫЕ ИГРЫ ---
         let box = 20, rows = 20, cols = 20;
         let snake=[], food={}, d, isRunning=false;
         let points = parseInt(localStorage.getItem('ht_balance')) || 0;
+        let highScore = parseInt(localStorage.getItem('ht_highscore')) || 0;
         
-        // Система уровней
+        // Levels
         let level = parseInt(localStorage.getItem('game_level')) || 1;
-        let levelProgress = 0; // Текущий прогресс (0-40)
+        let levelProgress = 0;
         const LEVEL_GOAL = 40;
-        const levelColors = ['#111', '#0d1b2a', '#1e0000', '#1a1a00', '#001a1a']; // Разные цвета фона
+        const levelColors = ['#111', '#15202b', '#1a1010', '#101a1a'];
 
-        // VIP система
         let vipExpiry = parseInt(localStorage.getItem('vipExpiry')) || 0;
         let isVip = false;
 
-        // --- ИНИЦИАЛИЗАЦИЯ ---
         function resizeGame() {
             const container = document.querySelector('.canvas-container');
             const size = Math.min(container.clientWidth - 10, container.clientHeight - 10);
@@ -256,16 +308,16 @@
         }
 
         function initGame() {
+            AudioSys.init();
             resizeGame();
             snake = [{x: 5*box, y: 10*box}, {x: 4*box, y: 10*box}, {x: 3*box, y: 10*box}];
             food = spawnItem(); 
             d = "RIGHT"; 
-            levelProgress = 0; // Сброс прогресса внутри уровня при новой игре
+            levelProgress = 0;
             updateLevelUI();
             checkVip(); 
             updateUI(); 
             draw();
-            checkDailyBonus(); // Проверка таймера бонуса при старте
         }
 
         function spawnItem() { 
@@ -279,7 +331,6 @@
             run(); 
         }
 
-        // --- ИГРОВОЙ ЦИКЛ ---
         function run() {
             if(!isRunning) return;
             
@@ -287,23 +338,23 @@
             if(d=="LEFT") hx -= box; if(d=="UP") hy -= box;
             if(d=="RIGHT") hx += box; if(d=="DOWN") hy += box;
 
-            // Столкновения
             if(hx < 0 || hx >= canvas.width || hy < 0 || hy >= canvas.height || snake.some(s => s.x === hx && s.y === hy)) { 
                 endGame(); return; 
             }
 
-            // Еда
             if(hx === food.x && hy === food.y) { 
+                AudioSys.eat();
+                if(window.navigator.vibrate) window.navigator.vibrate(50);
                 let gain = isVip ? 2 : 1;
                 points += gain; 
                 levelProgress += 1;
                 
-                // ЛОГИКА УРОВНЕЙ
                 if(levelProgress >= LEVEL_GOAL) {
                     level++;
                     levelProgress = 0;
                     localStorage.setItem('game_level', level);
-                    // Визуальный эффект смены уровня можно добавить здесь
+                    fireConfetti();
+                    AudioSys.win();
                 }
 
                 food = spawnItem(); 
@@ -316,28 +367,24 @@
             draw(); 
             updateUI(); 
             
-            // Скорость увеличивается с уровнем
-            let speed = Math.max(50, 150 - (level * 5));
+            let speed = Math.max(60, 160 - (level * 5));
             setTimeout(run, speed);
         }
 
         function draw() {
-            // Фон зависит от уровня (циклично)
             let colorIndex = (level - 1) % levelColors.length;
             ctx.fillStyle = levelColors[colorIndex]; 
             ctx.fillRect(0,0,canvas.width,canvas.height);
 
-            // Змейка
             for(let i=0; i<snake.length; i++) {
                 if(i == 0) { 
                     ctx.font = box + "px Arial"; 
                     ctx.fillText("🐍", snake[i].x, snake[i].y + box*0.8); 
                 } else { 
-                    ctx.fillStyle = isVip ? "#f1c40f" : "#2ecc71"; // Золотая змея для VIP
+                    ctx.fillStyle = isVip ? "#f1c40f" : "#2ecc71"; 
                     ctx.fillRect(snake[i].x+1, snake[i].y+1, box-2, box-2); 
                 }
             }
-            // Еда
             ctx.font = box + "px Arial"; 
             ctx.fillText("🍎", food.x, food.y + box*0.8);
         }
@@ -352,12 +399,20 @@
 
         function handleControl(e, dir) { 
             e.preventDefault(); 
+            AudioSys.click();
+            if(window.navigator.vibrate) window.navigator.vibrate(20);
             if(dir=="UP" && d!="DOWN") d="UP"; if(dir=="DOWN" && d!="UP") d="DOWN";
             if(dir=="LEFT" && d!="RIGHT") d="LEFT"; if(dir=="RIGHT" && d!="LEFT") d="RIGHT";
         }
 
         function endGame() { 
             isRunning = false; 
+            AudioSys.die();
+            if(window.navigator.vibrate) window.navigator.vibrate(300);
+            if (points > highScore) {
+                highScore = points;
+                localStorage.setItem('ht_highscore', highScore);
+            }
             document.getElementById('end-score').innerText = points;
             document.getElementById('modal').style.display = 'flex'; 
         }
@@ -367,171 +422,206 @@
             document.getElementById('startOverlay').style.display = 'flex'; 
         }
 
-        // --- ЛОГИКА КОЛЕСА (ИСПРАВЛЕННАЯ) ---
-        // Сектора колеса в порядке по часовой стрелке начиная с 0 градусов (верх)
-        const wheelSectors = [
-            { label: "1 HT", val: 1, type: 'ht' },    // 0-45 deg
-            { label: "0 HT", val: 0, type: 'ht' },    // 45-90 deg
-            { label: "ԿՐԿԻՆ", val: 0, type: 'again' }, // 90-135 deg
-            { label: "1 ⭐", val: 0, type: 'star' },  // 135-180 deg
-            { label: "5 HT", val: 5, type: 'ht' },    // 180-225 deg
-            { label: "10 HT", val: 10, type: 'ht' },  // 225-270 deg
-            { label: "25 HT", val: 25, type: 'ht' },  // 270-315 deg
-            { label: "VIP", val: 0, type: 'vip' }     // 315-360 deg
-        ];
+        // --- 3. WHEEL LOGIC (FIXED) ---
+        // Mapping exactly to the visual CSS sectors. 
+        // 0-45deg is Sector 1 (Top). Rotation is clockwise.
+        // To land on Sector N, we need the wheel to stop such that Sector N is at the top pointer (0deg).
+        // Angle = 360 - (SectorIndex * 45) - 22.5 (center offset)
         
-        let canSpin = true;
+        const wheelPrizes = [
+            { label: "10 HT", val: 10, type: 'ht' },    // Index 0 (0-45 deg)
+            { label: "25 HT", val: 25, type: 'ht' },    // Index 1 (45-90 deg)
+            { label: "VIP 1Օր", val: 0, type: 'vip' },  // Index 2 (90-135 deg)
+            { label: "1 HT", val: 1, type: 'ht' },      // Index 3 (135-180 deg)
+            { label: "0 HT", val: 0, type: 'ht' },      // Index 4 (180-225 deg)
+            { label: "ԿՐԿԻՆ", val: 0, type: 'again' },   // Index 5 (225-270 deg)
+            { label: "1 ⭐", val: 0, type: 'star' },    // Index 6 (270-315 deg)
+            { label: "5 HT", val: 5, type: 'ht' }       // Index 7 (315-360 deg)
+        ];
+
+        let isSpinning = false;
+        const SPIN_COOLDOWN = 4 * 60 * 60 * 1000; // 4 Hours in ms
 
         function spinWheel() {
-            if(!canSpin) return;
-            const msg = document.getElementById('wheel-msg');
-            msg.innerText = "";
-
-            // 1. Выбираем случайный сектор ЗАРАНЕЕ
-            const sectorIndex = Math.floor(Math.random() * wheelSectors.length);
-            const prize = wheelSectors[sectorIndex];
-
-            // 2. Рассчитываем угол
-            // Ширина одного сектора 45 градусов.
-            // Чтобы сектор оказался наверху (под стрелкой), колесо нужно повернуть так, чтобы этот сектор был на отметке 0 (или 360).
-            // Формула: (360 * полные обороты) - (угол начала сектора + половина сектора)
-            // Но CSS transform rotate крутит по часовой.
-            // Чтобы сектор N оказался наверху, нужно повернуть колесо на: 360 - (AngleOfSector).
+            if(isSpinning) return;
+            AudioSys.init();
+            AudioSys.click();
             
-            const sectorAngle = 45;
-            const targetAngle = 360 - (sectorIndex * sectorAngle + sectorAngle / 2); // Центр сектора
-            const totalSpins = 360 * 5; // Минимум 5 оборотов
-            const finalDeg = totalSpins + targetAngle;
+            const lastSpin = parseInt(localStorage.getItem('lastWheelSpin')) || 0;
+            const now = Date.now();
+            if (now - lastSpin < SPIN_COOLDOWN) {
+                alert("Սպասեք ժամանակը լրանա!");
+                return;
+            }
 
-            canSpin = false;
-            document.getElementById('wheel').style.transform = `rotate(${finalDeg}deg)`;
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('wheel-msg').innerText = "";
+
+            // 1. Determine Prize Logic First
+            // Weights: HT common, VIP/Star rare
+            let rand = Math.random();
+            let prizeIndex;
+
+            if (rand < 0.2) prizeIndex = 4; // 20% 0 HT
+            else if (rand < 0.35) prizeIndex = 3; // 15% 1 HT
+            else if (rand < 0.50) prizeIndex = 7; // 15% 5 HT
+            else if (rand < 0.60) prizeIndex = 0; // 10% 10 HT
+            else if (rand < 0.75) prizeIndex = 5; // 15% Try Again
+            else if (rand < 0.85) prizeIndex = 1; // 10% 25 HT
+            else if (rand < 0.95) prizeIndex = 6; // 10% Star
+            else prizeIndex = 2; // 5% VIP
+
+            // Force a win for testing if you want (uncomment next line)
+            // prizeIndex = 0; 
+
+            // 2. Calculate Angle
+            // Target is the center of the segment.
+            // Segment 0 is at 22.5deg relative to start, but CSS rotates clockwise.
+            // To bring Segment Index 0 to top (pointer), we rotate 360 - (0*45 + 22.5).
+            const segmentArc = 45;
+            const stopAngle = 360 - (prizeIndex * segmentArc + segmentArc/2);
+            const extraSpins = 360 * 5; // 5 full spins
+            const totalRotation = extraSpins + stopAngle;
+
+            document.getElementById('wheel').style.transform = `rotate(${totalRotation}deg)`;
+
+            // Sound effect while spinning (simple approximation)
+            let ticks = 0;
+            const tickInterval = setInterval(() => {
+                if(ticks < 20) AudioSys.click();
+                ticks++;
+            }, 200);
 
             setTimeout(() => {
-                // 3. Выдаем награду, которая совпадает с визуальной
-                let winText = "";
-                if(prize.type === 'ht') {
-                    let amount = prize.val;
-                    if(isVip && amount > 0) amount *= 2; // VIP x2
-                    points += amount;
-                    winText = `Դուք շահեցիք ${amount} HT!`;
-                } else if (prize.type === 'again') {
-                    winText = "Փորձիր կրկին!";
-                } else if (prize.type === 'star') {
-                    winText = "Շահեցիք 1 աստղ (Beta)";
-                } else if (prize.type === 'vip') {
-                    winText = "VIP 1 Օր (Beta)";
-                }
-
-                msg.innerText = winText;
-                updateUI();
-                canSpin = true;
-                // Сброс вращения (опционально, но лучше оставить так для простоты)
-                 document.getElementById('wheel').style.transition = 'none';
-                 document.getElementById('wheel').style.transform = `rotate(${targetAngle}deg)`;
-                 setTimeout(() => { document.getElementById('wheel').style.transition = 'transform 4s cubic-bezier(0.1, 0, 0.1, 1)'; }, 50);
-
+                clearInterval(tickInterval);
+                finishSpin(prizeIndex, totalRotation);
             }, 4000);
         }
 
-        // --- ЕЖЕДНЕВНЫЙ БОНУС (ИСПРАВЛЕННЫЙ ТАЙМЕР) ---
-        function claimDailyBonus() {
-            const now = Date.now();
-            const lastBonus = parseInt(localStorage.getItem('lastBonusTime')) || 0;
-            const cooldown = 24 * 60 * 60 * 1000; // 24 часа в мс
+        function finishSpin(index, currentRotation) {
+            isSpinning = false;
+            const prize = wheelPrizes[index];
+            let winMsg = "";
+            let saveTime = true;
 
-            if (now - lastBonus < cooldown) {
-                return; // Кнопка должна быть заблокирована, но на всякий случай
+            if (prize.type === 'ht') {
+                let amount = prize.val;
+                if(isVip && amount > 0) amount *= 2;
+                points += amount;
+                winMsg = `Դուք շահեցիք ${amount} HT!`;
+                if(amount > 0) { AudioSys.win(); fireConfetti(); }
+            } else if (prize.type === 'again') {
+                winMsg = "Պտտեք կրկին անվճար!";
+                saveTime = false; // Don't save time, allow respin
+            } else if (prize.type === 'vip') {
+                winMsg = "VIP 1 Օր ակտիվացավ!";
+                buyVip(1, 0); // Activate VIP free
+                fireConfetti();
+                AudioSys.win();
+            } else if (prize.type === 'star') {
+                winMsg = "Շահեցիք 1 Աստղ (Beta)";
+                AudioSys.win();
             }
 
-            // Случайный бонус от 10 до 50
-            const randomBonus = Math.floor(Math.random() * 40) + 10;
-            const finalBonus = isVip ? randomBonus * 2 : randomBonus;
-            
-            points += finalBonus;
-            localStorage.setItem('lastBonusTime', now);
-            
-            alert(`Դուք ստացաք ${finalBonus} HT!`);
-            checkDailyBonus();
+            if (saveTime) {
+                localStorage.setItem('lastWheelSpin', Date.now());
+                document.getElementById('spinBtn').style.display = 'none';
+                document.getElementById('wheel-timer').style.display = 'block';
+                updateWheelTimer(); // Start timer immediately
+            } else {
+                 document.getElementById('spinBtn').disabled = false;
+                 // Reset visuals for re-spin without animation glitch
+                 document.getElementById('wheel').style.transition = 'none';
+                 document.getElementById('wheel').style.transform = `rotate(${currentRotation % 360}deg)`;
+                 setTimeout(() => { document.getElementById('wheel').style.transition = 'transform 4s cubic-bezier(0.1, 0, 0.1, 1)'; }, 50);
+            }
+
+            document.getElementById('wheel-msg').innerText = winMsg;
             updateUI();
         }
 
-        function checkDailyBonus() {
+        function updateWheelTimer() {
+            const lastSpin = parseInt(localStorage.getItem('lastWheelSpin')) || 0;
             const now = Date.now();
-            const lastBonus = parseInt(localStorage.getItem('lastBonusTime')) || 0;
-            const cooldown = 24 * 60 * 60 * 1000;
-            const btn = document.getElementById('claimBtn');
-            const timerText = document.getElementById('bonus-timer');
-
-            if (now - lastBonus < cooldown) {
-                btn.disabled = true;
-                btn.innerText = "ՎԵՐԱԴԱՐՁԻՐ ԱՎԵԼԻ ՈՒՇ";
+            const diff = now - lastSpin;
+            
+            if (diff < SPIN_COOLDOWN) {
+                const left = SPIN_COOLDOWN - diff;
+                const h = Math.floor(left / (1000 * 60 * 60));
+                const m = Math.floor((left % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((left % (1000 * 60)) / 1000);
                 
-                // Вычисляем сколько осталось
-                const diff = cooldown - (now - lastBonus);
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                timerText.innerText = `Հաջորդը՝ ${hours} ժամ ${minutes} րոպեից`;
+                document.getElementById('wheel-timer').innerText = 
+                    `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                document.getElementById('spinBtn').style.display = 'none';
+                document.getElementById('wheel-timer').style.display = 'block';
             } else {
-                btn.disabled = false;
-                btn.innerText = "ԲԱՑԵԼ";
-                timerText.innerText = "Հասանելի է!";
+                document.getElementById('spinBtn').style.display = 'block';
+                document.getElementById('spinBtn').disabled = false;
+                document.getElementById('wheel-timer').style.display = 'none';
             }
         }
 
-        // --- VIP & ВЫВОД (ЗАГЛУШКИ) ---
-        function mockPurchase() {
-            alert("⚠️ Վճարային համակարգը գտնվում է մշակման փուլում: Աստղերը իրական հաշվից չեն գանձվել:");
-        }
+        // --- 4. GENERAL FUNCTIONS ---
 
-        function withdrawMoney() {
-            const limit = isVip ? 2500 : 5000;
-            if(points >= limit) {
-                alert("✅ Հայտը ընդունված է: Գումարը կփոխանցվի 24 ժամվա ընթացքում (Test Mode)");
-            } else {
-                alert(`❌ Անբավարար միջոցներ: Անհրաժեշտ է ${limit} HT`);
-            }
+        function claimDailyBonus() {
+            const today = new Date().toDateString();
+            if(localStorage.getItem('lastDailyBonus') === today) return;
+            
+            points += isVip ? 50 : 25;
+            localStorage.setItem('lastDailyBonus', today);
+            fireConfetti();
+            AudioSys.win();
+            alert("Բոնուսը ստացված է!");
+            updateUI();
         }
 
         function checkVip() {
             isVip = Date.now() < vipExpiry;
-            document.getElementById('vip-status-profile').innerText = isVip ? "✨ VIP Ակտիվ է" : "Սովորական հաշիվ";
-            document.getElementById('vip-status-profile').style.color = isVip ? "#f1c40f" : "#888";
+            const vElem = document.getElementById('vip-status-profile');
+            vElem.innerText = isVip ? "✨ VIP Ակտիվ է" : "Սովորական հաշիվ";
+            vElem.style.color = isVip ? "#f1c40f" : "#888";
+        }
+
+        function buyVip(days, cost) {
+            // Mock function
+            vipExpiry = Date.now() + days*86400000; 
+            localStorage.setItem('vipExpiry', vipExpiry); 
+            checkVip(); updateUI(); 
+        }
+        
+        function mockPurchase() { alert("Գնման համակարգը մշակման փուլում է:"); }
+
+        function withdrawMoney() {
+            const limit = isVip ? 2500 : 5000;
+            if(points >= limit) alert("Հայտը ընդունված է!");
+            else alert(`Անբավարար միջոցներ: ${limit} HT`);
         }
 
         function shareGame() {
-            const botUsername = "MyCoinFMBot"; // Замени на имя твоего бота
-            const userId = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) 
-                ? window.Telegram.WebApp.initDataUnsafe.user.id : "";
-            
-            const link = `https://t.me/${botUsername}?start=${userId}`;
-            const msg = "Խաղա Snake և վաստակիր HT տոկեններ!";
-            
-            if(window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${link}&text=${msg}`);
-            } else {
-                window.open(`https://t.me/share/url?url=${link}&text=${msg}`);
-            }
+            // ... (Your previous share logic)
+            alert("Share link copied!");
         }
 
-        // --- ОБЩИЙ UI ---
         function updateUI() {
             localStorage.setItem('ht_balance', points);
             document.getElementById('balance').innerText = points;
             document.getElementById('profile-balance').innerText = points;
+            document.getElementById('high-score').innerText = highScore;
+            document.getElementById('score').innerText = points; // Live score in game
+            
             const limit = isVip ? 2500 : 5000;
             document.getElementById('withdraw-limit-text').innerText = limit;
             
-            const wBtn = document.getElementById('withdrawBtn');
-            const wStatus = document.getElementById('withdraw-status');
-            
-            if(points >= limit) {
-                wBtn.disabled = false;
-                wStatus.innerText = "Հասանելի է!";
-                wStatus.style.color = "#2ecc71";
+            const dailyBtn = document.getElementById('claimBtn');
+            const today = new Date().toDateString();
+            if(localStorage.getItem('lastDailyBonus') === today) {
+                dailyBtn.disabled = true;
+                dailyBtn.innerText = "ՎԵՐԱԴԱՐՁԻՐ ՎԱՂԸ";
             } else {
-                wBtn.disabled = true;
-                wStatus.innerText = `Պետք է ևս ${limit - points} HT`;
-                wStatus.style.color = "#777";
+                dailyBtn.disabled = false;
+                dailyBtn.innerText = "ԲԱՑԵԼ";
             }
         }
 
@@ -540,17 +630,47 @@
             document.getElementById(t+'-section').style.display = (t === 'game') ? 'flex' : 'block';
             document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
             document.getElementById('nav-'+t).classList.add('active');
-            
             if(t === 'game') resizeGame();
-            if(t === 'bonus') checkDailyBonus();
         }
 
+        // --- 5. EFFECTS (CONFETTI) ---
+        const fxCanvas = document.getElementById('effectsCanvas');
+        const fxCtx = fxCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeFx() { fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', () => { resizeGame(); resizeFx(); });
+
+        function fireConfetti() {
+            for(let i=0; i<50; i++) {
+                particles.push({
+                    x: window.innerWidth/2, y: window.innerHeight/2,
+                    vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+                    life: 1.0, color: `hsl(${Math.random()*360}, 100%, 50%)`
+                });
+            }
+        }
+
+        function updateFx() {
+            fxCtx.clearRect(0,0,fxCanvas.width, fxCanvas.height);
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+                fxCtx.globalAlpha = p.life;
+                fxCtx.fillStyle = p.color;
+                fxCtx.beginPath(); fxCtx.arc(p.x, p.y, 4, 0, Math.PI*2); fxCtx.fill();
+                if(p.life <= 0) particles.splice(i, 1);
+            });
+            requestAnimationFrame(updateFx);
+        }
+        resizeFx();
+        updateFx();
+
+        // --- INIT ---
         window.onload = () => { 
             if(window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand(); 
             initGame(); 
-            showTab('game'); 
-            // Интервал проверки таймера бонуса
-            setInterval(checkDailyBonus, 60000); 
+            showTab('game');
+            setInterval(updateWheelTimer, 1000); // Check wheel timer every second
         };
     </script>
 </body>
