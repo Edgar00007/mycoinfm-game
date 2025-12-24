@@ -37,31 +37,58 @@
         .content-area { flex-grow: 1; position: relative; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
         .page-section { display: none; width: 100%; min-height: 100%; flex-direction: column; align-items: center; }
 
+        /* Game Section Styles */
         #game-section { height: 100%; overflow: hidden; justify-content: space-between; padding-bottom: 10px; box-sizing: border-box; }
-        .game-info { text-align: center; font-size: 12px; color: #aaa; padding: 5px; background: rgba(0,0,0,0.2); width: 100%; }
+        .level-info { width: 100%; display: flex; justify-content: space-between; padding: 5px 15px; box-sizing: border-box; background: rgba(0,0,0,0.3); font-size: 12px; font-weight: bold; color: var(--primary); }
+        .progress-bar { width: 100%; height: 4px; background: #333; position: relative; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s; }
+        
         .canvas-container { flex-grow: 1; width: 100%; display: flex; align-items: center; justify-content: center; position: relative; padding: 10px; box-sizing: border-box; }
         .canvas-wrapper { position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.5); border-radius: 8px; }
-        canvas { display: block; background: var(--canvas-bg); border: 2px solid var(--primary); border-radius: 8px; }
-        .start-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); border-radius: 8px; display: flex; align-items: center; justify-content: center; z-index: 20; }
+        canvas { display: block; background: var(--canvas-bg); border: 2px solid var(--primary); border-radius: 8px; transition: background 1s; }
+        .start-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); border-radius: 8px; display: flex; align-items: center; justify-content: center; z-index: 20; flex-direction: column; }
+        
         .controls-area { flex-shrink: 0; display: flex; justify-content: center; margin-bottom: 5px; }
         .controls { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(2, 50px); gap: 6px; }
         .ctrl-btn { width: 100%; height: 100%; background: var(--surface); border: 1px solid #444; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--primary); box-shadow: 0 3px 0 #000; touch-action: manipulation; }
         .ctrl-btn:active { transform: translateY(3px); box-shadow: 0 0 0; background: #2a2f38; }
 
+        /* Wheel Styles */
         .wheel-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 20px; }
         .wheel-outer { position: relative; width: 280px; height: 280px; border-radius: 50%; border: 8px solid var(--surface); overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        /* Стрелка теперь указывает вниз сверху, логика поворота переписана под это */
         .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 40px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 25; }
         #wheel { 
             width: 100%; height: 100%; border-radius: 50%; position: relative;
-            transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); 
-            background: conic-gradient(#f1c40f 0deg 45deg, #2c3e50 45deg 90deg, #f39c12 90deg 135deg, #34495e 135deg 180deg, #d4ac0d 180deg 225deg, #2c3e50 225deg 270deg, #e67e22 270deg 315deg, #8e44ad 315deg 360deg);
+            transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); 
+            /* Сектора идут по часовой стрелке, каждый 45 градусов */
+            background: conic-gradient(
+                #f1c40f 0deg 45deg,   /* Сектор 1 */
+                #2c3e50 45deg 90deg,  /* Сектор 2 */
+                #f39c12 90deg 135deg, /* Сектор 3 */
+                #34495e 135deg 180deg, /* Сектор 4 */
+                #d4ac0d 180deg 225deg, /* Сектор 5 */
+                #2c3e50 225deg 270deg, /* Сектор 6 */
+                #e67e22 270deg 315deg, /* Сектор 7 */
+                #8e44ad 315deg 360deg  /* Сектор 8 */
+            );
         }
         .wheel-label { position: absolute; top: 50%; left: 50%; width: 50%; height: 20px; margin-top: -10px; transform-origin: left center; display: flex; align-items: center; justify-content: flex-end; font-weight: 900; font-size: 12px; padding-right: 25px; box-sizing: border-box; color: #fff; text-shadow: 1px 1px 2px #000; }
-        .l1 { transform: rotate(22.5deg); color: #000; text-shadow: none; } .l2 { transform: rotate(67.5deg); } .l3 { transform: rotate(112.5deg); color: #000; text-shadow: none; } .l4 { transform: rotate(157.5deg); } .l5 { transform: rotate(202.5deg); color: #000; text-shadow: none; } .l6 { transform: rotate(247.5deg); } .l7 { transform: rotate(292.5deg); color: #000; text-shadow: none; } .l8 { transform: rotate(337.5deg); }
+        
+        /* Поворот надписей точно в центр секторов */
+        .l1 { transform: rotate(22.5deg); color: #000; text-shadow: none; } 
+        .l2 { transform: rotate(67.5deg); } 
+        .l3 { transform: rotate(112.5deg); color: #000; text-shadow: none; } 
+        .l4 { transform: rotate(157.5deg); } 
+        .l5 { transform: rotate(202.5deg); color: #000; text-shadow: none; } 
+        .l6 { transform: rotate(247.5deg); } 
+        .l7 { transform: rotate(292.5deg); color: #000; text-shadow: none; } 
+        .l8 { transform: rotate(337.5deg); }
 
         .scrollable-content { padding: 15px; width: 100%; box-sizing: border-box; }
         .card { background: var(--surface); padding: 15px; border-radius: 16px; width: 100%; margin-bottom: 12px; border: 1px solid #333; box-sizing: border-box; }
-        .btn-main { padding: 10px 25px; border-radius: 10px; border: none; background: var(--primary); font-weight: 900; font-size: 14px; color: #000; cursor: pointer; }
+        .btn-main { padding: 10px 25px; border-radius: 10px; border: none; background: var(--primary); font-weight: 900; font-size: 14px; color: #000; cursor: pointer; transition: 0.2s; }
+        .btn-main:disabled { background: #555; color: #888; cursor: not-allowed; }
         .btn-buy { padding: 8px 20px; border-radius: 10px; border: none; background: var(--btn-blue); font-weight: 900; font-size: 14px; color: #fff; cursor: pointer; box-shadow: 0 3px 0 #1e5a82; }
         .btn-withdraw { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--success); font-weight: 900; font-size: 16px; color: #000; cursor: pointer; margin-top: 10px; }
         .btn-withdraw:disabled { background: #444; color: #777; cursor: not-allowed; }
@@ -80,7 +107,6 @@
         <div class="header">
             <div class="header-left">
                 <span>🐍 <span id="score">0</span></span>
-                <span class="mute-btn" onclick="toggleMute()" id="muteIcon">🔇</span>
             </div>
             <div style="text-align: right;">
                 <span style="font-size: 9px; opacity: 0.7;">ԲԱԼԱՆՍ</span><br>
@@ -90,11 +116,17 @@
 
         <div class="content-area">
             <div id="game-section" class="page-section" style="display: flex;">
-                <div class="game-info">Հավաքիր 40 միավոր բոնուսի համար!</div>
+                <div class="level-info">
+                    <span>LEVEL <span id="level-display">1</span></span>
+                    <span><span id="level-progress-text">0</span> / 40</span>
+                </div>
+                <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+                
                 <div class="canvas-container">
                     <div class="canvas-wrapper" id="canvasWrapper">
                         <canvas id="gameCanvas"></canvas>
                         <div id="startOverlay" class="start-overlay">
+                            <h2 style="margin: 0 0 10px 0; color: var(--primary);">LEVEL <span id="overlay-level">1</span></h2>
                             <button id="startBtn" class="btn-main" onclick="startGame()">ԽԱՂԱԼ</button>
                         </div>
                     </div>
@@ -126,7 +158,7 @@
                         </div>
                     </div>
                     <button id="spinBtn" class="btn-main" style="width: 150px;" onclick="spinWheel()">ՊՏՏԵԼ</button>
-                    <p id="wheel-msg" style="color: var(--primary); font-weight: bold; min-height: 20px; text-align: center;"></p>
+                    <p id="wheel-msg" style="color: var(--primary); font-weight: bold; min-height: 20px; text-align: center; margin-top: 10px;"></p>
                 </div>
             </div>
 
@@ -140,9 +172,9 @@
                     </ul>
                 </div>
                 <div class="card">
-                    <div class="shop-item"><div><b>5 ՕՐ</b></div><button class="btn-buy" onclick="buyVip(5, 20)">20 ⭐</button></div>
-                    <div class="shop-item"><div style="color: var(--primary);"><b>15 ՕՐ</b></div><button class="btn-buy" onclick="buyVip(15, 150)">150 ⭐</button></div>
-                    <div class="shop-item"><div style="color: #e74c3c;"><b>30 ՕՐ</b></div><button class="btn-buy" onclick="buyVip(30, 500)">500 ⭐</button></div>
+                    <div class="shop-item"><div><b>5 ՕՐ</b></div><button class="btn-buy" onclick="mockPurchase()">20 ⭐</button></div>
+                    <div class="shop-item"><div style="color: var(--primary);"><b>15 ՕՐ</b></div><button class="btn-buy" onclick="mockPurchase()">150 ⭐</button></div>
+                    <div class="shop-item"><div style="color: #e74c3c;"><b>30 ՕՐ</b></div><button class="btn-buy" onclick="mockPurchase()">500 ⭐</button></div>
                 </div>
             </div>
 
@@ -151,7 +183,7 @@
                     <h2>Օրական բոնուս</h2>
                     <div style="font-size: 80px; margin: 20px;">🎁</div>
                     <button id="claimBtn" class="btn-main" style="width:100%;" onclick="claimDailyBonus()">ԲԱՑԵԼ</button>
-                    <p id="bonus-msg" style="margin-top: 15px; font-size: 14px; color: #888;"></p>
+                    <p id="bonus-timer" style="margin-top: 15px; font-size: 14px; color: #e74c3c; font-weight: bold;"></p>
                 </div>
             </div>
 
@@ -169,7 +201,7 @@
                         <span style="color: var(--success);">1 $</span>
                     </div>
                     <p id="withdraw-status" style="font-size: 12px; text-align: center; margin: 5px 0;">Բեռնում...</p>
-                    <button id="withdrawBtn" class="btn-withdraw" onclick="withdrawMoney()" disabled>ՓՈԽԱՆԱԿԵԼ</button>
+                    <button id="withdrawBtn" class="btn-withdraw" onclick="withdrawMoney()">ՓՈԽԱՆԱԿԵԼ</button>
                 </div>
                 <div class="card" style="border-left: 4px solid #2481cc;">
                     <h3>🤝 Ռեֆերալ</h3>
@@ -190,53 +222,132 @@
 
     <div id="modal" class="overlay">
         <h2 style="color: #e74c3c;">ԽԱՂՆ ԱՎԱՐՏՎԵՑ</h2>
-        <p id="end-score" style="font-size: 24px; color: #fff;"></p>
+        <p style="color: #fff;">Միավոր: <span id="end-score" style="font-weight: bold; color: var(--primary);">0</span></p>
         <button class="btn-main" onclick="closeModal()">ԿՐԿԻՆ</button>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        let box = 20, rows, cols, snake=[], food={}, d, isRunning=false;
+        
+        // --- ПЕРЕМЕННЫЕ ИГРЫ ---
+        let box = 20, rows = 20, cols = 20;
+        let snake=[], food={}, d, isRunning=false;
         let points = parseInt(localStorage.getItem('ht_balance')) || 0;
+        
+        // Система уровней
+        let level = parseInt(localStorage.getItem('game_level')) || 1;
+        let levelProgress = 0; // Текущий прогресс (0-40)
+        const LEVEL_GOAL = 40;
+        const levelColors = ['#111', '#0d1b2a', '#1e0000', '#1a1a00', '#001a1a']; // Разные цвета фона
+
+        // VIP система
         let vipExpiry = parseInt(localStorage.getItem('vipExpiry')) || 0;
         let isVip = false;
 
+        // --- ИНИЦИАЛИЗАЦИЯ ---
         function resizeGame() {
             const container = document.querySelector('.canvas-container');
-            const size = Math.min(container.clientWidth - 20, container.clientHeight - 20);
+            const size = Math.min(container.clientWidth - 10, container.clientHeight - 10);
             box = Math.floor(size / 20); 
             canvas.width = box * 20; canvas.height = box * 20;
-            const wrapper = document.getElementById('canvasWrapper');
-            wrapper.style.width = canvas.width + 'px'; wrapper.style.height = canvas.height + 'px';
-            rows = 20; cols = 20;
+            document.getElementById('canvasWrapper').style.width = canvas.width + 'px'; 
+            document.getElementById('canvasWrapper').style.height = canvas.height + 'px';
         }
 
         function initGame() {
             resizeGame();
             snake = [{x: 5*box, y: 10*box}, {x: 4*box, y: 10*box}, {x: 3*box, y: 10*box}];
-            food = spawnItem(); d = "RIGHT"; checkVip(); updateUI(); draw();
+            food = spawnItem(); 
+            d = "RIGHT"; 
+            levelProgress = 0; // Сброс прогресса внутри уровня при новой игре
+            updateLevelUI();
+            checkVip(); 
+            updateUI(); 
+            draw();
+            checkDailyBonus(); // Проверка таймера бонуса при старте
         }
-        function spawnItem() { return { x: Math.floor(Math.random() * cols) * box, y: Math.floor(Math.random() * rows) * box }; }
-        function startGame() { document.getElementById('startOverlay').style.display = 'none'; isRunning = true; initGame(); run(); }
 
+        function spawnItem() { 
+            return { x: Math.floor(Math.random() * cols) * box, y: Math.floor(Math.random() * rows) * box }; 
+        }
+
+        function startGame() { 
+            document.getElementById('startOverlay').style.display = 'none'; 
+            isRunning = true; 
+            initGame(); 
+            run(); 
+        }
+
+        // --- ИГРОВОЙ ЦИКЛ ---
         function run() {
             if(!isRunning) return;
+            
             let hx = snake[0].x, hy = snake[0].y;
             if(d=="LEFT") hx -= box; if(d=="UP") hy -= box;
             if(d=="RIGHT") hx += box; if(d=="DOWN") hy += box;
-            if(hx < 0 || hx >= canvas.width || hy < 0 || hy >= canvas.height || snake.some(s => s.x === hx && s.y === hy)) { endGame(); return; }
-            if(hx === food.x && hy === food.y) { points += isVip ? 2 : 1; food = spawnItem(); } else { snake.pop(); }
-            snake.unshift({x: hx, y: hy}); draw(); updateUI(); setTimeout(run, 150);
+
+            // Столкновения
+            if(hx < 0 || hx >= canvas.width || hy < 0 || hy >= canvas.height || snake.some(s => s.x === hx && s.y === hy)) { 
+                endGame(); return; 
+            }
+
+            // Еда
+            if(hx === food.x && hy === food.y) { 
+                let gain = isVip ? 2 : 1;
+                points += gain; 
+                levelProgress += 1;
+                
+                // ЛОГИКА УРОВНЕЙ
+                if(levelProgress >= LEVEL_GOAL) {
+                    level++;
+                    levelProgress = 0;
+                    localStorage.setItem('game_level', level);
+                    // Визуальный эффект смены уровня можно добавить здесь
+                }
+
+                food = spawnItem(); 
+                updateLevelUI();
+            } else { 
+                snake.pop(); 
+            }
+
+            snake.unshift({x: hx, y: hy}); 
+            draw(); 
+            updateUI(); 
+            
+            // Скорость увеличивается с уровнем
+            let speed = Math.max(50, 150 - (level * 5));
+            setTimeout(run, speed);
         }
 
         function draw() {
-            ctx.fillStyle = "#111"; ctx.fillRect(0,0,canvas.width,canvas.height);
+            // Фон зависит от уровня (циклично)
+            let colorIndex = (level - 1) % levelColors.length;
+            ctx.fillStyle = levelColors[colorIndex]; 
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            // Змейка
             for(let i=0; i<snake.length; i++) {
-                if(i == 0) { ctx.font = (box) + "px Arial"; ctx.fillText("🐍", snake[i].x, snake[i].y + box); }
-                else { ctx.fillStyle = "#2ecc71"; ctx.fillRect(snake[i].x+1, snake[i].y+1, box-2, box-2); }
+                if(i == 0) { 
+                    ctx.font = box + "px Arial"; 
+                    ctx.fillText("🐍", snake[i].x, snake[i].y + box*0.8); 
+                } else { 
+                    ctx.fillStyle = isVip ? "#f1c40f" : "#2ecc71"; // Золотая змея для VIP
+                    ctx.fillRect(snake[i].x+1, snake[i].y+1, box-2, box-2); 
+                }
             }
-            ctx.fillText("🍎", food.x, food.y + box);
+            // Еда
+            ctx.font = box + "px Arial"; 
+            ctx.fillText("🍎", food.x, food.y + box*0.8);
+        }
+
+        function updateLevelUI() {
+            document.getElementById('level-display').innerText = level;
+            document.getElementById('overlay-level').innerText = level;
+            document.getElementById('level-progress-text').innerText = levelProgress;
+            let percent = (levelProgress / LEVEL_GOAL) * 100;
+            document.getElementById('progress-fill').style.width = percent + '%';
         }
 
         function handleControl(e, dir) { 
@@ -244,77 +355,184 @@
             if(dir=="UP" && d!="DOWN") d="UP"; if(dir=="DOWN" && d!="UP") d="DOWN";
             if(dir=="LEFT" && d!="RIGHT") d="LEFT"; if(dir=="RIGHT" && d!="LEFT") d="RIGHT";
         }
-        function endGame() { isRunning = false; document.getElementById('modal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; document.getElementById('startOverlay').style.display = 'flex'; }
 
-        function spinWheel() {
-            const lastSpin = parseInt(localStorage.getItem('lastSpinTime')) || 0;
-            if(Date.now() - lastSpin < 14400000) return;
-            const deg = 1800 + Math.random() * 360;
-            document.getElementById('wheel').style.transform = `rotate(${deg}deg)`;
-            setTimeout(() => {
-                const win = [1, 5, 10][Math.floor(Math.random()*3)];
-                points += isVip ? win*2 : win;
-                localStorage.setItem('lastSpinTime', Date.now());
-                updateUI();
-            }, 5000);
+        function endGame() { 
+            isRunning = false; 
+            document.getElementById('end-score').innerText = points;
+            document.getElementById('modal').style.display = 'flex'; 
         }
 
+        function closeModal() { 
+            document.getElementById('modal').style.display = 'none'; 
+            document.getElementById('startOverlay').style.display = 'flex'; 
+        }
+
+        // --- ЛОГИКА КОЛЕСА (ИСПРАВЛЕННАЯ) ---
+        // Сектора колеса в порядке по часовой стрелке начиная с 0 градусов (верх)
+        const wheelSectors = [
+            { label: "1 HT", val: 1, type: 'ht' },    // 0-45 deg
+            { label: "0 HT", val: 0, type: 'ht' },    // 45-90 deg
+            { label: "ԿՐԿԻՆ", val: 0, type: 'again' }, // 90-135 deg
+            { label: "1 ⭐", val: 0, type: 'star' },  // 135-180 deg
+            { label: "5 HT", val: 5, type: 'ht' },    // 180-225 deg
+            { label: "10 HT", val: 10, type: 'ht' },  // 225-270 deg
+            { label: "25 HT", val: 25, type: 'ht' },  // 270-315 deg
+            { label: "VIP", val: 0, type: 'vip' }     // 315-360 deg
+        ];
+        
+        let canSpin = true;
+
+        function spinWheel() {
+            if(!canSpin) return;
+            const msg = document.getElementById('wheel-msg');
+            msg.innerText = "";
+
+            // 1. Выбираем случайный сектор ЗАРАНЕЕ
+            const sectorIndex = Math.floor(Math.random() * wheelSectors.length);
+            const prize = wheelSectors[sectorIndex];
+
+            // 2. Рассчитываем угол
+            // Ширина одного сектора 45 градусов.
+            // Чтобы сектор оказался наверху (под стрелкой), колесо нужно повернуть так, чтобы этот сектор был на отметке 0 (или 360).
+            // Формула: (360 * полные обороты) - (угол начала сектора + половина сектора)
+            // Но CSS transform rotate крутит по часовой.
+            // Чтобы сектор N оказался наверху, нужно повернуть колесо на: 360 - (AngleOfSector).
+            
+            const sectorAngle = 45;
+            const targetAngle = 360 - (sectorIndex * sectorAngle + sectorAngle / 2); // Центр сектора
+            const totalSpins = 360 * 5; // Минимум 5 оборотов
+            const finalDeg = totalSpins + targetAngle;
+
+            canSpin = false;
+            document.getElementById('wheel').style.transform = `rotate(${finalDeg}deg)`;
+
+            setTimeout(() => {
+                // 3. Выдаем награду, которая совпадает с визуальной
+                let winText = "";
+                if(prize.type === 'ht') {
+                    let amount = prize.val;
+                    if(isVip && amount > 0) amount *= 2; // VIP x2
+                    points += amount;
+                    winText = `Դուք շահեցիք ${amount} HT!`;
+                } else if (prize.type === 'again') {
+                    winText = "Փորձիր կրկին!";
+                } else if (prize.type === 'star') {
+                    winText = "Շահեցիք 1 աստղ (Beta)";
+                } else if (prize.type === 'vip') {
+                    winText = "VIP 1 Օր (Beta)";
+                }
+
+                msg.innerText = winText;
+                updateUI();
+                canSpin = true;
+                // Сброс вращения (опционально, но лучше оставить так для простоты)
+                 document.getElementById('wheel').style.transition = 'none';
+                 document.getElementById('wheel').style.transform = `rotate(${targetAngle}deg)`;
+                 setTimeout(() => { document.getElementById('wheel').style.transition = 'transform 4s cubic-bezier(0.1, 0, 0.1, 1)'; }, 50);
+
+            }, 4000);
+        }
+
+        // --- ЕЖЕДНЕВНЫЙ БОНУС (ИСПРАВЛЕННЫЙ ТАЙМЕР) ---
         function claimDailyBonus() {
-            const today = new Date().toDateString();
-            if(localStorage.getItem('lastBonusDate') === today) return;
-            points += isVip ? 50 : 25;
-            localStorage.setItem('lastBonusDate', today);
-            updateUI(); checkDailyBonus();
+            const now = Date.now();
+            const lastBonus = parseInt(localStorage.getItem('lastBonusTime')) || 0;
+            const cooldown = 24 * 60 * 60 * 1000; // 24 часа в мс
+
+            if (now - lastBonus < cooldown) {
+                return; // Кнопка должна быть заблокирована, но на всякий случай
+            }
+
+            // Случайный бонус от 10 до 50
+            const randomBonus = Math.floor(Math.random() * 40) + 10;
+            const finalBonus = isVip ? randomBonus * 2 : randomBonus;
+            
+            points += finalBonus;
+            localStorage.setItem('lastBonusTime', now);
+            
+            alert(`Դուք ստացաք ${finalBonus} HT!`);
+            checkDailyBonus();
+            updateUI();
         }
 
         function checkDailyBonus() {
+            const now = Date.now();
+            const lastBonus = parseInt(localStorage.getItem('lastBonusTime')) || 0;
+            const cooldown = 24 * 60 * 60 * 1000;
             const btn = document.getElementById('claimBtn');
-            btn.disabled = localStorage.getItem('lastBonusDate') === new Date().toDateString();
+            const timerText = document.getElementById('bonus-timer');
+
+            if (now - lastBonus < cooldown) {
+                btn.disabled = true;
+                btn.innerText = "ՎԵՐԱԴԱՐՁԻՐ ԱՎԵԼԻ ՈՒՇ";
+                
+                // Вычисляем сколько осталось
+                const diff = cooldown - (now - lastBonus);
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                timerText.innerText = `Հաջորդը՝ ${hours} ժամ ${minutes} րոպեից`;
+            } else {
+                btn.disabled = false;
+                btn.innerText = "ԲԱՑԵԼ";
+                timerText.innerText = "Հասանելի է!";
+            }
+        }
+
+        // --- VIP & ВЫВОД (ЗАГЛУШКИ) ---
+        function mockPurchase() {
+            alert("⚠️ Վճարային համակարգը գտնվում է մշակման փուլում: Աստղերը իրական հաշվից չեն գանձվել:");
+        }
+
+        function withdrawMoney() {
+            const limit = isVip ? 2500 : 5000;
+            if(points >= limit) {
+                alert("✅ Հայտը ընդունված է: Գումարը կփոխանցվի 24 ժամվա ընթացքում (Test Mode)");
+            } else {
+                alert(`❌ Անբավարար միջոցներ: Անհրաժեշտ է ${limit} HT`);
+            }
         }
 
         function checkVip() {
             isVip = Date.now() < vipExpiry;
             document.getElementById('vip-status-profile').innerText = isVip ? "✨ VIP Ակտիվ է" : "Սովորական հաշիվ";
+            document.getElementById('vip-status-profile').style.color = isVip ? "#f1c40f" : "#888";
         }
 
-        function buyVip(d, c) { 
-            vipExpiry = Date.now() + d*86400000; 
-            localStorage.setItem('vipExpiry', vipExpiry); 
-            checkVip(); updateUI(); 
-        }
-
-        // === ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРИГЛАШЕНИЯ С ID ===
         function shareGame() {
-            const botUsername = "MyCoinFMBot";
-            let userId = 0;
+            const botUsername = "MyCoinFMBot"; // Замени на имя твоего бота
+            const userId = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) 
+                ? window.Telegram.WebApp.initDataUnsafe.user.id : "";
             
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
-                userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-            }
-
-            const botLink = `https://t.me/${botUsername}?start=${userId}`; 
-            const shareText = "Միացիր ինձ MyCoinFM-ում! 🐍 Խաղա և հավաքիր HT տոկեններ:";
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${encodeURIComponent(shareText)}`;
-
-            points += 15;
-            updateUI();
-
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.openTelegramLink(shareUrl);
+            const link = `https://t.me/${botUsername}?start=${userId}`;
+            const msg = "Խաղա Snake և վաստակիր HT տոկեններ!";
+            
+            if(window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${link}&text=${msg}`);
             } else {
-                window.open(shareUrl, '_blank');
+                window.open(`https://t.me/share/url?url=${link}&text=${msg}`);
             }
         }
 
+        // --- ОБЩИЙ UI ---
         function updateUI() {
             localStorage.setItem('ht_balance', points);
             document.getElementById('balance').innerText = points;
             document.getElementById('profile-balance').innerText = points;
             const limit = isVip ? 2500 : 5000;
             document.getElementById('withdraw-limit-text').innerText = limit;
-            document.getElementById('withdrawBtn').disabled = points < limit;
-            document.getElementById('withdraw-status').innerText = points < limit ? `Պետք է ևս ${limit - points} HT` : "Հասանելի է!";
+            
+            const wBtn = document.getElementById('withdrawBtn');
+            const wStatus = document.getElementById('withdraw-status');
+            
+            if(points >= limit) {
+                wBtn.disabled = false;
+                wStatus.innerText = "Հասանելի է!";
+                wStatus.style.color = "#2ecc71";
+            } else {
+                wBtn.disabled = true;
+                wStatus.innerText = `Պետք է ևս ${limit - points} HT`;
+                wStatus.style.color = "#777";
+            }
         }
 
         function showTab(t) {
@@ -322,9 +540,18 @@
             document.getElementById(t+'-section').style.display = (t === 'game') ? 'flex' : 'block';
             document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
             document.getElementById('nav-'+t).classList.add('active');
+            
+            if(t === 'game') resizeGame();
+            if(t === 'bonus') checkDailyBonus();
         }
 
-        window.onload = () => { if(window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand(); initGame(); showTab('game'); };
+        window.onload = () => { 
+            if(window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand(); 
+            initGame(); 
+            showTab('game'); 
+            // Интервал проверки таймера бонуса
+            setInterval(checkDailyBonus, 60000); 
+        };
     </script>
 </body>
 </html>
